@@ -10,9 +10,9 @@ const registerForm = document.getElementById('register_form');
   //if username in DB does not match password, deny access
   //if user.hasEmail && gets 5 false attempts, lock account and send email to user
 
-
+/*
 function handleLoginSubmit(event) {
-    event.preventDefault(); 
+    //event.preventDefault(); 
   
     const username = document.getElementById('user').value;
     const password = document.getElementById('pass').value;
@@ -22,7 +22,7 @@ function handleLoginSubmit(event) {
   }
   
   function handleRegisterSubmit(event) {
-    event.preventDefault(); // no default form submission
+    //event.preventDefault(); // no default form submission
   
     const username = document.getElementById('user_register').value;
     const email = document.getElementById('email_register').value;
@@ -31,6 +31,53 @@ function handleLoginSubmit(event) {
     console.log('Register info:', { username, email, password });
     //registration stuff here
   }
+*/
+
+
+
+function handleLoginSubmit(event) {
+  event.preventDefault(); //prevent default form submission(page reload)
+  const username = document.getElementById('user').value;
+  const password = document.getElementById('pass').value;
+
+  console.log('Login info:', { username, password });
+
+  //send POST request to server w/ user data
+  fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, password })
+  })
+  .then(response => response)
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+}
+
+function handleRegisterSubmit(event) {
+  event.preventDefault(); 
+  const username = document.getElementById('user_register').value;
+  const email = document.getElementById('email_register').value;
+  const password = document.getElementById('pass_register').value;
+
+  console.log('Register info:', { username, email, password });
+
+  
+  fetch('/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, email, password })
+  })
+  .then(response => response)
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+}
+
+
+
 
   loginForm.addEventListener('submit', handleLoginSubmit);
   registerForm.addEventListener('submit', handleRegisterSubmit);
