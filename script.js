@@ -5,6 +5,9 @@ const loginBtn = document.querySelector('.login-btn');
 const loginForm = document.getElementById('login_form');
 const registerForm = document.getElementById('register_form');
 
+
+
+
 //TODO: check these against the database w/ pseudo code below, add separate checks fdr registration using the commented vars above
  //if username already in DB, deny access
   //if username in DB does not match password, deny access
@@ -34,13 +37,13 @@ function handleLoginSubmit(event) {
 */
 
 
-
+isLoggedIn = false
 function handleLoginSubmit(event) {
   event.preventDefault(); //prevent default form submission(page reload)
-  const username = document.getElementById('user').value;
+  const email = document.getElementById('user').value;
   const password = document.getElementById('pass').value;
 
-  console.log('Login info:', { username, password });
+  console.log('Login info:', { email, password });
 
   //send POST request to server w/ user data
   fetch('/login', {
@@ -48,10 +51,11 @@ function handleLoginSubmit(event) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ email, password })
   })
   .then(response => response)
   .then(data => console.log(data))
+  .then(()=>window.location.href = '/userhome')
   .catch(error => console.error(error));
 }
 
