@@ -19,6 +19,7 @@ const reForm = document.getElementById('re_form');
 
 
 isLoggedIn = false
+//add checks to remove received stuff from incoming, etx
 function handleReceived(event) {
   event.preventDefault(); //prevent default form submission(page reload)
   const re_id = document.getElementById('received_ID').value;
@@ -27,6 +28,11 @@ function handleReceived(event) {
   console.log('new re_id:', { re_id });
 
   const li = document.createElement('li');
+  const numChildren = re_ids.children.length;
+  if(numChildren > 18){
+    console.log("removing prev. top item from display window")
+    re_ids.removeChild(re_ids.children[0]);
+  }
   li.textContent = re_id;
   re_ids.appendChild(li);
 
@@ -51,6 +57,11 @@ function handleIncoming(event) {
   console.log('new in_id:', { in_id });
 
   const li = document.createElement('li');
+  const numChildren = in_ids.children.length;
+  if(numChildren > 18){
+    console.log("removing prev. top item from display window")
+    in_ids.removeChild(in_ids.children[0]);
+  }
   li.textContent = in_id;
   in_ids.appendChild(li);
   

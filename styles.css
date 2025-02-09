@@ -222,10 +222,12 @@ form {
     height: 172%;
     background: #fff;
     display: flex;
+    flex-direction: column;
     align-items: center;
     color:#ae0c00;
     text-align: center;
     padding: 20px;
+    
     z-index: 1;
 }
 .incoming {
@@ -235,9 +237,11 @@ form {
     height: 172%;
     background: #fff;
     display: flex;
+    flex-direction: column;
     align-items: center;
     color:#ae0c00;
     text-align: center;
+    
     padding: 20px;
     z-index: 1;
 }
@@ -251,6 +255,7 @@ form {
     position: relative;
     bottom: 0;
     display:flex;
+    flex-direction:column;
     align-items:center;
     gap:10px;
 }
