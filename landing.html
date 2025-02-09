@@ -11,25 +11,56 @@
 </head>
 
 <body>
-    
+    <!--
     <div class="container">
         <h1>Package Info</h1>
         <div class="incoming">
             <div>
-                <h1>Incoming</h1>
+                <form action = "/register" method = "POST">
+                    <h1 style = "top:0;">Incoming</h1>
                 <ul id = "incoming_IDs">
                 </ul>
+                <span style="height:20px;"></span>`
+                <button type = "submit" class = "btn_incoming"> Input to Server </button>
+                </form>
             </div>
         </div>
 
         <div class="received">
             <div>
-                <h1>Recieved</h1>
+                <form action = "/userhome" method = "POST">
+                    <h1>Received</h1>
                 <ul id = "received_IDs">
                 </ul>
+                <span style="height:20px;"></span>`
+                <button type = "submit" class = "btn_incoming"> Input to Server </button>
+                </form>
             </div>
         </div>
     
+    </div>
+    -->
+    <div class="container">
+        <h1>Package Info</h1>
+        <div class="incoming">
+            <div class="incoming-header">
+                <h1>Incoming</h1>
+            </div>
+            <ul id="incoming_IDs"></ul>
+            <div class="incoming-footer">
+                <button type="submit" class="btn_incoming">Input to Server</button>
+            </div>
+        </div>
+    
+        <div class="received">
+            <div class="received-header">
+                <h1>Received</h1>
+            </div>
+            <ul id="received_IDs"></ul>
+            <div class="received-footer">
+                <button type="submit" class="btn_incoming">Input to Server</button>
+            </div>
+        </div>
     </div>
     <script src = "landing.js"></script>
 </body>

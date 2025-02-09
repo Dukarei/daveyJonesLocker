@@ -28,7 +28,20 @@ body {
     padding: 10px;
     color:#ae0c00;
 }
-
+.container_home {
+    position: relative;
+    width: 850px;
+    height: 250px;
+    background: #fff;
+    border-radius: 30px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+    margin: 20px;
+    overflow: hidden;
+    text-align: center;
+    justify-content: center;
+    padding: 10px;
+    color:#ae0c00;
+}
 .form-box {
     position: absolute;
     right: 0;
@@ -118,6 +131,44 @@ form {
     color: #fff;
     font-weight: 600;
 }
+.btn_incoming {
+    width: 100%;
+    height: 48px;
+    background:#ae0c00;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border: none;
+    bottom:0;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+}
+.btn_link {
+    width: 75%;
+    height: 70px;
+    background:#ae0c00;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+}
+.btn_link1 {
+    width: 75%;
+    height: 70px;
+    background:#ae0c00;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+    bottom:0px
+}
 
 .container p {
     font-size: 14.5px;
@@ -162,6 +213,8 @@ form {
     left: 50%;
 }
 
+
+
 .received {
     position: absolute;
     right: 0;
@@ -189,6 +242,15 @@ form {
     z-index: 1;
 }
 
+.incoming-header, .received-header {
+    position: absolute;
+    top: 20px;
+}
+
+.incoming-footer, .received-footer {
+    position: relative;
+    bottom: 0;
+}
 .toggle-panel {
     position: absolute;
     width: 50%;
