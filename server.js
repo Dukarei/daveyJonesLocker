@@ -45,11 +45,29 @@ app.get('/register',  checkNotAuthenicated,(req, res) => {
 app.get('/userhome', checkAuthenticated, (req, res) => {
     res.sendFile(__dirname + '/landing.html')
 })
-
+app.get('/update_re', checkAuthenticated, (req, res) => {
+    res.sendFile(__dirname + '/landing.html')
+})
+app.get('/update_in', checkAuthenticated, (req, res) => {
+    res.sendFile(__dirname + '/landing.html')
+})
 app.get('/users', (req,res) => {
     res.json(users)
 })
 app.post('/userhome', checkAuthenticated, (req,res) => {
+
+})
+
+app.post('/update_re', checkAuthenticated, (req,res) => {
+//code for received lists from db
+console.log('request body: ', req.body)
+
+
+})
+
+app.post('/update_in', checkAuthenticated, (req,res) => {
+//code for updating incoming lists from db
+console.log('request body: ', req.body)
 
 })
 app.post('/register', checkNotAuthenicated, async (req, res) => {

@@ -40,7 +40,7 @@
     
     </div>
     -->
-    <div class="container">
+    <div class="container" id = "cont" >      
         <h1>Package Info</h1>
         <div class="incoming">
             <div class="incoming-header">
@@ -48,7 +48,11 @@
             </div>
             <ul id="incoming_IDs"></ul>
             <div class="incoming-footer">
-                <button type="submit" class="btn_incoming">Input to Server</button>
+                <form action="/update_in" method="POST" id = "in_form"
+                    style = " display: flex;flex-direction: row;align-items: center;gap: 10px; " >
+                    <input type="text" id="incoming_ID" style="height: 40px; width: 50%;">
+                    <button type="submit" class="btn_incoming" id = "in_btn">Input to Server</button>
+                </form>
             </div>
         </div>
     
@@ -58,11 +62,14 @@
             </div>
             <ul id="received_IDs"></ul>
             <div class="received-footer">
-                <button type="submit" class="btn_incoming">Input to Server</button>
+                <form action="/update_re" method="POST" id = "re_form"
+                    style = "display: flex;flex-direction: row;align-items: center;gap: 10px;"  >       
+                    <input type="text" id="received_ID" style="height: 40px; width: 50%;">
+                    <button type="submit" class="btn_incoming" id = "re_btn">Input to Server</button>
+                </form>
             </div>
         </div>
     </div>
-    <script src = "landing.js"></script>
-</body>
-
-</html>
+    <script src="landing.js"></script>
+    </body>
+    </html>
