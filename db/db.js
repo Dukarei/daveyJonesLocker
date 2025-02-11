@@ -33,6 +33,26 @@ export async function getUserById(id) {
   }
 }
 
+//nonsense
+export async function getIn_ID(email, value) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ? && value = ?', [email, value]);
+    console.log(rows);
+    return rows[0];
+  } catch (error) {
+    console.error('Error executing query:', error);
+  }
+}
+export async function getRe_ID(email, value) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM received_IDs WHERE email = ? && value = ?', [email, value]);
+    console.log(rows);
+    return rows[0];
+  } catch (error) {
+    console.error('Error executing query:', error);
+  }
+}
+
 //getter functions to return user table or incoming/received ids for a certain user
 export async function getIncoming(email) {
   try {

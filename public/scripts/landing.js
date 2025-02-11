@@ -5,6 +5,10 @@
 //refresh so it keeps up with user input stuff at all times  
 //logout button 
 
+//import { json } from "express";
+
+//import { response } from "express";
+
 
 
 const container = document.getElementById('cont');
@@ -15,6 +19,113 @@ const inForm = document.getElementById('in_form');
 const reForm = document.getElementById('re_form');
 
 const logoutForm = document.getElementById('logout-form');
+
+function getUpdates() {
+  console.log("Getting updates")
+  fetch('/getUpdates')
+    .then(response => response.json())
+    .then(data => updateUI(data))
+    .catch(error => console.error(error));
+}
+/*
+function updateUI(data) {
+  const incomingIds = document.getElementById('incoming_IDs');
+  const receivedIds = document.getElementById('received_IDs');
+  const numChildren = incomingIds.children.length;
+  const numChildren2 = receivedIds.children.length;
+  // Update the incoming and received tables with the new data
+  incomingIds.innerHTML = '';
+  data.incoming.forEach(id => {
+    if(numChildren > 18){
+      console.log("removing prev. top item from display window")
+      incomingIds.removeChild(incomingIds.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = id;
+    incomingIds.appendChild(li);
+  });
+
+  receivedIds.innerHTML = '';
+  data.received.forEach(id => {
+    if(numChildren2 > 18){
+      console.log("removing prev. top item from display window")
+      receivedIds.removeChild(receivedIds.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = id;
+    receivedIds.appendChild(li);
+  });
+}*/
+function updateUI(data) {
+  const incomingIds = document.getElementById('incoming_IDs');
+  const receivedIds = document.getElementById('received_IDs');
+  const numChildren = incomingIds.children.length;
+  const numChildren2 = receivedIds.children.length;
+
+  incomingIds.innerHTML = '';
+  data.incoming.forEach(id => {
+    if(numChildren > 18){
+      console.log("removing prev. top item from display window")
+      incomingIds.removeChild(incomingIds.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = `Value: ${id.value}`;
+    incomingIds.appendChild(li);
+  });
+
+  receivedIds.innerHTML = '';
+  data.received.forEach(id => {
+    if(numChildren2 > 18){
+      console.log("removing prev. top item from display window")
+      receivedIds.removeChild(receivedIds.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = `Value: ${id.value}`;
+    receivedIds.appendChild(li);
+  });
+}
+
+
+
+
+function updateReceived(response) {
+  const re_id = response.re_id
+  console.log(re_id)
+  const receivedIds = document.getElementById('received_IDs');
+  const numChildren = receivedIds.children.length;
+
+  //receivedIds.innerHTML = '';
+  
+  while (numChildren > 18){
+      console.log("removing prev. top item from display window")
+      receivedIds.removeChild(receivedIds.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = `Value: ${re_id}`;
+    receivedIds.appendChild(li);
+  
+}
+function updateIncoming(response) {
+  const in_id = response.in_id
+  console.log(response)
+  const incomingIds = document.getElementById('incoming_IDs');
+  const numChildren = incomingIds.children.length;
+
+  //incomingIds.innerHTML = '';
+  
+  while (numChildren > 18){
+      console.log("removing prev. top item from display window")
+      incomingIds.removeChild(incomingIds.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = `Value: ${in_id}`;
+    incomingIds.appendChild(li);
+  
+
+}
+
+
+
 
 logoutForm.addEventListener('submit', (event) => {
     event.preventDefault(); // Prevent default form submission
@@ -52,7 +163,7 @@ function handleReceived(event) {
     re_ids.removeChild(re_ids.children[0]);
   }
   li.textContent = re_id;
-  re_ids.appendChild(li);
+  //re_ids.appendChild(li);
 
   //send POST request to server w/ user data
   fetch('/update_re', {
@@ -62,37 +173,48 @@ function handleReceived(event) {
     },
     body: JSON.stringify({ re_id })
   })
-  .then(response => response)
-  .then(data => console.log(data))
+  .then(response => response.json())
+  .then(data => updateReceived(data))
+  /*
   .catch(error => console.error(error));
+  fetch('/re_id', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => updateReceived(data))
+  .catch(error => console.error(error));
+  */
 }
 
 function handleIncoming(event) {
   event.preventDefault(); 
   const in_id  = document.getElementById('incoming_ID').value;
-  const in_ids = document.getElementById('incoming_IDs');
-
   console.log('new in_id:', { in_id });
-
-  const li = document.createElement('li');
-  const numChildren = in_ids.children.length;
-  if(numChildren > 18){
-    console.log("removing prev. top item from display window")
-    in_ids.removeChild(in_ids.children[0]);
-  }
-  li.textContent = in_id;
-  in_ids.appendChild(li);
-  
   fetch('/update_in', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => updateIncoming(data))
+  .catch(error => console.error(error));
+  /*
+  fetch('/in_id', {
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({in_id })
   })
-  .then(response => response)
-  .then(data => console.log(data))
+  .then(response => response.json())
+  .then(data => updateIncoming(data))
   .catch(error => console.error(error));
+  */
+  
 }
 
 
@@ -100,6 +222,7 @@ function handleIncoming(event) {
 
 inForm.addEventListener('submit', handleIncoming);
 reForm.addEventListener('submit', handleReceived);
+
 
 reBtn.addEventListener('click', () => {
     container.classList.add('active');
@@ -114,3 +237,5 @@ function updateLists(){
 
 }
 //updateLists();
+getUpdates();
+//setInterval(getUpdates, 20000);

@@ -5,6 +5,8 @@ if(process.env.NODE_ENV !== 'production'){
 
 //importing database functions
 import {
+    getIn_ID,
+    getRe_ID,
     getUserByEmail,
     getUserById,
     getIncoming,
@@ -59,6 +61,15 @@ const app = express()
 
 app.use(express.json())
 app.use(express.static('./'));
+const options = {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+};
+
+app.use(express.static(path.join(__dirname, 'public'), options));
 app.use(express.urlencoded({ extended: false}))//allows access to page html
 const users = [{name:"poop"}] //replace w/ db
 
@@ -73,34 +84,36 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 app.get('/',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, 'public', 'home.html');
+    const filePath = path.join(__dirname, '../public', 'home.html');
     res.sendFile(filePath);
 })
 /*
 app.get('/login',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, 'public', 'index.html');
+    const filePath = path.join(__dirname, '../public', 'index.html');
     res.sendFile(filePath);
 })
 app.get('/register',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, 'public', 'index.html');
+    const filePath = path.join(__dirname, '../public', 'index.html');
     res.sendFile(filePath);
 })
     */
 app.get('/registration',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, 'public', 'index.html');
+  
+    const filePath = path.join(__dirname, '../public', 'index.html');
     res.sendFile(filePath);
-})
+  
+    })
 app.get('/userhome', checkAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'landing.html');
+    const filePath = path.join(__dirname, '../public', 'landing.html');
     res.sendFile(filePath);
 })
 /*
 app.get('/update_re', checkAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'landing.html');
+    const filePath = path.join(__dirname, '../public', 'landing.html');
     res.sendFile(filePath);
 })
 app.get('/update_in', checkAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'landing.html');
+    const filePath = path.join(__dirname, '../public', 'landing.html');
     res.sendFile(filePath);
 })*/
 app.get('/users', (req,res) => {
@@ -110,6 +123,14 @@ app.post('/userhome', checkAuthenticated, async (req,res) => {
 
 })
 
+app.get('/in_id', (req,res) => {
+    console.log(getIn_ID())
+    res.json(getIn_ID())
+})
+app.get('/re_id', (req,res) => {
+    console.log(getRe_ID())
+    res.json(getRe_ID())
+})
 
 
 //need to error test
@@ -117,9 +138,10 @@ app.post('/update_re', checkAuthenticated, async (req,res) => {
 //code for received lists from db
 console.log('request body: ', req.body.re_id)
 try{
+    const re_id = req.body.re_id
     const received = await insertReceived(req.user.email, req.body.re_id);
-    console.log('received IDs: ', received)
-    res.json(received)
+    console.log('received ID: ', re_id)
+    res.json({received, re_id})
 } catch (error) {
     console.error('Error inserting received IDs:', error)
     res.status(500).json({ message: 'Error inserting received IDs' })
@@ -127,11 +149,12 @@ try{
 
 app.post('/update_in', checkAuthenticated, async (req,res) => {
     //code for received lists from db
+    const in_id = req.body.in_id
     console.log('request body: ', req.body.in_id)
     try{
         const incoming = await insertIncoming(req.user.email, req.body.in_id);
-        console.log('incoming IDs: ', incoming)
-        res.json(incoming)
+        console.log('incoming ID: ', in_id)
+        res.json({incoming, in_id})
     } catch (error) {
         console.error('Error inserting incoming IDs:', error)
         res.status(500).json({ message: 'Error inserting incoming IDs' })
@@ -139,7 +162,16 @@ app.post('/update_in', checkAuthenticated, async (req,res) => {
 
 
 
-
+app.get('/getUpdates', checkAuthenticated, async (req, res) => {
+    try {
+          const incoming = await getIncoming(req.user.email);
+          const received = await getReceived(req.user.email);
+          res.json({ incoming, received });
+    } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Error getting updates' });
+    }
+      });
 app.get('/received', checkAuthenticated, async (req,res) => {
     //code for received lists from db
     try{
