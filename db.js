@@ -14,6 +14,25 @@ const pool = mysql.createPool({
   database: process.env.MYSQL_DATABASE
 }).promise();
 
+
+//user authentication functions
+export async function getUserByEmail(email) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    return rows[0];
+  } catch (error) {
+    console.error('Error getting user by email:', error);
+  }
+}
+export async function getUserById(id) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+    return rows[0];
+  } catch (error) {
+    console.error('Error getting user by id:', error);
+  }
+}
+
 //getter functions to return user table or incoming/received ids for a certain user
 export async function getIncoming(email) {
   try {
@@ -24,6 +43,8 @@ export async function getIncoming(email) {
     console.error('Error executing query:', error);
   }
 }
+
+
 
 export async function getReceived(email) {
   try {

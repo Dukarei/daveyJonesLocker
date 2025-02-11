@@ -5,6 +5,8 @@ if(process.env.NODE_ENV !== 'production'){
 
 //importing database functions
 import {
+    getUserByEmail,
+    getUserById,
     getIncoming,
     getReceived,
     getUsers,
@@ -31,10 +33,27 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import {initializePassport} from './passport-config.js'
+/*
 initializePassport(passport, 
     email => users.find(user => user.email === email), 
     id => users.find(user => user.id === id)
-)
+)*/
+initializePassport(passport, 
+    async (email) => {
+      try {
+        return await getUserByEmail(email);
+      } catch (error) {
+        console.error('Error getting user by email:', error);
+      }
+    },
+    async (id) => {
+        try {
+            return await getUserById(id);
+          } catch (error) {
+            console.error('Error getting user by ID:', error);
+          }
+    }
+  )
 
 const app = express()
 
@@ -87,35 +106,77 @@ app.get('/update_in', checkAuthenticated, (req, res) => {
 app.get('/users', (req,res) => {
     res.json(getUsers())
 })
-app.post('/userhome', checkAuthenticated, (req,res) => {
+app.post('/userhome', checkAuthenticated, async (req,res) => {
 
 })
 
-app.post('/update_re', checkAuthenticated, (req,res) => {
+
+
+//need to error test
+app.post('/update_re', checkAuthenticated, async (req,res) => {
 //code for received lists from db
-console.log('request body: ', req.body)
+console.log('request body: ', req.body.re_id)
+try{
+    const received = await insertReceived(req.user.email, req.body.re_id);
+    console.log('received IDs: ', received)
+    res.json(received)
+} catch (error) {
+    console.error('Error inserting received IDs:', error)
+    res.status(500).json({ message: 'Error inserting received IDs' })
+  } })
+
+app.post('/update_in', checkAuthenticated, async (req,res) => {
+    //code for received lists from db
+    console.log('request body: ', req.body.in_id)
+    try{
+        const incoming = await insertIncoming(req.user.email, req.body.in_id);
+        console.log('incoming IDs: ', incoming)
+        res.json(incoming)
+    } catch (error) {
+        console.error('Error inserting incoming IDs:', error)
+        res.status(500).json({ message: 'Error inserting incoming IDs' })
+      } })
 
 
-})
 
-app.post('/update_in', checkAuthenticated, (req,res) => {
-//code for updating incoming lists from db
-console.log('request body: ', req.body)
 
-})
+app.get('/received', checkAuthenticated, async (req,res) => {
+    //code for received lists from db
+    try{
+    const received = await getReceived(req.user.email);
+    console.log('received IDs: ', received)
+} catch (error) {
+    console.error('Error getting received IDs:', error)
+  }  })
+    
+  app.get('/incoming', checkAuthenticated, async (req,res) => {
+    //code for received lists from db
+    try{
+    const incoming = await getIncoming(req.user.email);
+    console.log('incoming IDs: ', incoming)
+} catch (error) {
+    console.error('Error getting incoming IDs:', error)
+  }  })
+
+
+
+
 app.post('/register', checkNotAuthenicated, async (req, res) => {
     try {
         
         console.log('Request body:', req.body);
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        
         const user = { 
             name: req.body.username, 
             password: hashedPassword, 
             email: req.body.email, 
             id: Date.now().toString()
         }
-        users.push(user)
+        //old array method users.push(user)
+        insertUser(req.body.email, hashedPassword)
+        
         console.log('User registered successfully:', user)
         res.status(201).send('User registered successfully')
     } catch (error) {
@@ -179,4 +240,4 @@ function checkNotAuthenicated(req,res,next){
 
 
 
-app.listen(3000)
+app.listen(8080)
