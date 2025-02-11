@@ -14,8 +14,6 @@ CREATE TABLE incoming_IDs (
 
 );
 
-#all values w/ email = req.email will be shipped back to create incoming or received lists. 
-#double check encryption stuff(local copy that never leaves db + clientside copy vs normal stuff) 
 
 CREATE TABLE received_IDs (
     email VARCHAR(255),
@@ -37,3 +35,6 @@ VALUES
 ('jeff@shit','2667');
 
 SELECT * FROM incoming_IDs;
+
+#all values w/ email = req.email will be shipped back to create incoming or received lists. 
+#double check encryption stuff(local copy that never leaves db + clientside copy vs normal stuff) 

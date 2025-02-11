@@ -13,28 +13,6 @@ const registerForm = document.getElementById('register_form');
   //if username in DB does not match password, deny access
   //if user.hasEmail && gets 5 false attempts, lock account and send email to user
 
-/*
-function handleLoginSubmit(event) {
-    //event.preventDefault(); 
-  
-    const username = document.getElementById('user').value;
-    const password = document.getElementById('pass').value;
-  
-    console.log('Login info:', { username, password });
-    //login stuff here
-  }
-  
-  function handleRegisterSubmit(event) {
-    //event.preventDefault(); // no default form submission
-  
-    const username = document.getElementById('user_register').value;
-    const email = document.getElementById('email_register').value;
-    const password = document.getElementById('pass_register').value;
-  
-    console.log('Register info:', { username, email, password });
-    //registration stuff here
-  }
-*/
 
 
 isLoggedIn = false
