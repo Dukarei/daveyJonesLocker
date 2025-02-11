@@ -24,6 +24,11 @@ import passport from 'passport'
 import flash from 'express-flash'
 import session from 'express-session' //using session allows req.user.name always = present user in sessions
 import methodOverride from 'method-override'
+import path from 'path'
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import {initializePassport} from './passport-config.js'
 initializePassport(passport, 
@@ -49,23 +54,36 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 app.get('/',  checkNotAuthenicated,(req, res) => {
-    res.sendFile( './home.html')
+    const filePath = path.join(__dirname, 'public', 'home.html');
+    res.sendFile(filePath);
 })
+/*
 app.get('/login',  checkNotAuthenicated,(req, res) => {
-    res.sendFile('./index.html')
+    const filePath = path.join(__dirname, 'public', 'index.html');
+    res.sendFile(filePath);
 })
 app.get('/register',  checkNotAuthenicated,(req, res) => {
-    res.sendFile('./index.html')
+    const filePath = path.join(__dirname, 'public', 'index.html');
+    res.sendFile(filePath);
+})
+    */
+app.get('/registration',  checkNotAuthenicated,(req, res) => {
+    const filePath = path.join(__dirname, 'public', 'index.html');
+    res.sendFile(filePath);
 })
 app.get('/userhome', checkAuthenticated, (req, res) => {
-    res.sendFile('./landing.html')
+    const filePath = path.join(__dirname, 'public', 'landing.html');
+    res.sendFile(filePath);
 })
+/*
 app.get('/update_re', checkAuthenticated, (req, res) => {
-    res.sendFile('./landing.html')
+    const filePath = path.join(__dirname, 'public', 'landing.html');
+    res.sendFile(filePath);
 })
 app.get('/update_in', checkAuthenticated, (req, res) => {
-    res.sendFile('./landing.html')
-})
+    const filePath = path.join(__dirname, 'public', 'landing.html');
+    res.sendFile(filePath);
+})*/
 app.get('/users', (req,res) => {
     res.json(getUsers())
 })
@@ -146,7 +164,7 @@ function checkAuthenticated(req, res, next){
     if(req.isAuthenticated()){
         return next()
     }else{
-        res.redirect('/')
+        return res.redirect('/')
     }
 }
 

@@ -27,7 +27,8 @@ logoutForm.addEventListener('submit', (event) => {
     })
     .then((response) => response.json())
     .then((data) => console.log(data))
-    .catch((error) => console.error(error));
+    .catch((error) => console.error(error))
+    
 
     // Redirect to the desired page
     window.location.href = '/';
@@ -112,4 +113,4 @@ reBtn.addEventListener('click', () => {
 function updateLists(){
 
 }
-updateLists();
+//updateLists();
