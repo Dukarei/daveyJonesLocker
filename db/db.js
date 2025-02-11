@@ -33,7 +33,7 @@ export async function getUserById(id) {
   }
 }
 
-//nonsense
+//return a single ID, looked into these as an option for speeding up user landing page
 export async function getIn_ID(email, value) {
   try {
     const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ? && value = ?', [email, value]);

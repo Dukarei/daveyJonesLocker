@@ -3,7 +3,7 @@ if(process.env.NODE_ENV !== 'production'){
     dotenv.config()    
 }
 
-//importing database functions
+//importing database functions - some not presently used but may be eventually
 import {
     getIn_ID,
     getRe_ID,
@@ -40,6 +40,7 @@ initializePassport(passport,
     email => users.find(user => user.email === email), 
     id => users.find(user => user.id === id)
 )*/
+//using async db functions to initialize passport emai/id variables and thereby serialization descrbied in passport-config.js
 initializePassport(passport, 
     async (email) => {
       try {
@@ -69,9 +70,9 @@ const options = {
   }
 };
 
-app.use(express.static(path.join(__dirname, 'public'), options));
-app.use(express.urlencoded({ extended: false}))//allows access to page html
-const users = [{name:"poop"}] //replace w/ db
+app.use(express.static(path.join(__dirname, 'public'), options));//allows serving of css
+app.use(express.urlencoded({ extended: false}))//allows access to page html elemts
+//const users = [{name:"poop"}] //replace w/ db
 
 app.use(flash())
 app.use(session({
@@ -115,32 +116,31 @@ app.get('/update_re', checkAuthenticated, (req, res) => {
 app.get('/update_in', checkAuthenticated, (req, res) => {
     const filePath = path.join(__dirname, '../public', 'landing.html');
     res.sendFile(filePath);
-})*/
+})
 app.get('/users', (req,res) => {
     res.json(getUsers())
-})
+})*/
 app.post('/userhome', checkAuthenticated, async (req,res) => {
 
 })
 
-app.get('/in_id', (req,res) => {
+app.get('/in_id', checkAuthenticated, (req,res) => {
     console.log(getIn_ID())
     res.json(getIn_ID())
 })
-app.get('/re_id', (req,res) => {
+app.get('/re_id', checkAuthenticated, (req,res) => {
     console.log(getRe_ID())
     res.json(getRe_ID())
 })
 
 
-//need to error test
+//need to error test these two, made for individual updates to user's re/in tables
 app.post('/update_re', checkAuthenticated, async (req,res) => {
-//code for received lists from db
 console.log('request body: ', req.body.re_id)
 try{
-    const re_id = req.body.re_id
-    const received = await insertReceived(req.user.email, req.body.re_id);
-    console.log('received ID: ', re_id)
+    const re_id = req.body.re_id //pulling from form contents in front-end
+    const received = await insertReceived(req.user.email, req.body.re_id);//move to db
+    console.log('received ID: ', re_id) //log new id and send to response
     res.json({received, re_id})
 } catch (error) {
     console.error('Error inserting received IDs:', error)
@@ -148,7 +148,6 @@ try{
   } })
 
 app.post('/update_in', checkAuthenticated, async (req,res) => {
-    //code for received lists from db
     const in_id = req.body.in_id
     console.log('request body: ', req.body.in_id)
     try{
@@ -161,8 +160,9 @@ app.post('/update_in', checkAuthenticated, async (req,res) => {
       } })
 
 
-
+//get methods for full tables, respective to a certain user
 app.get('/getUpdates', checkAuthenticated, async (req, res) => {
+    //retrieves new elements from db at startup/periodically
     try {
           const incoming = await getIncoming(req.user.email);
           const received = await getReceived(req.user.email);

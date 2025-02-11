@@ -56,6 +56,7 @@ function updateUI(data) {
     receivedIds.appendChild(li);
   });
 }*/
+//fills out the incoming and received tables on website load
 function updateUI(data) {
   const incomingIds = document.getElementById('incoming_IDs');
   const receivedIds = document.getElementById('received_IDs');
@@ -87,7 +88,7 @@ function updateUI(data) {
 
 
 
-
+//functions made for updating a list after a single addition, still need to add deletion options
 function updateReceived(response) {
   const re_id = response.re_id
   console.log(re_id)
@@ -95,7 +96,7 @@ function updateReceived(response) {
   const numChildren = receivedIds.children.length;
 
   //receivedIds.innerHTML = '';
-  
+  //ensure that this check is working as intended and maintaining lowered child count on screen
   while (numChildren > 18){
       console.log("removing prev. top item from display window")
       receivedIds.removeChild(receivedIds.children[0]);
@@ -148,6 +149,7 @@ logoutForm.addEventListener('submit', (event) => {
 
 
 isLoggedIn = false
+//these checks are for moving new values to db and hopefully pre-sorting css elements before actually adding them in updateReceived()
 //add checks to remove received stuff from incoming, etx
 function handleReceived(event) {
   event.preventDefault(); //prevent default form submission(page reload)
@@ -174,9 +176,10 @@ function handleReceived(event) {
     body: JSON.stringify({ re_id })
   })
   .then(response => response.json())
-  .then(data => updateReceived(data))
-  /*
+  .then(data => updateReceived(data)) //update received with data acquired from this function
+  
   .catch(error => console.error(error));
+  /*
   fetch('/re_id', {
     method: 'GET',
     headers: {
@@ -200,7 +203,7 @@ function handleIncoming(event) {
     }
   })
   .then(response => response.json())
-  .then(data => updateIncoming(data))
+  .then(data => updateIncoming(data)) //update incoming with data acquired from this function
   .catch(error => console.error(error));
   /*
   fetch('/in_id', {
