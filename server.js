@@ -1,16 +1,31 @@
+import dotenv from 'dotenv'
 if(process.env.NODE_ENV !== 'production'){
-    require('dotenv').config()
+    dotenv.config()    
 }
 
+//importing database functions
+import {
+    getIncoming,
+    getReceived,
+    getUsers,
+    insertIncoming,
+    insertReceived,
+    insertUser,
+    deleteReceived,
+    deleteIncoming,
+    deleteUser,
+    inReceived,
+    inIncoming,
+    inUsers} from './db.js'
 
-const express = require('express')
-const bcrypt = require('bcrypt')
-const passport = require('passport')
-const flash = require('express-flash')
-const session = require('express-session') //using session allows req.user.name always = present user in sessions
-const methodOverride = require('method-override')
+import express from 'express'
+import bcrypt from 'bcrypt'
+import passport from 'passport'
+import flash from 'express-flash'
+import session from 'express-session' //using session allows req.user.name always = present user in sessions
+import methodOverride from 'method-override'
 
-const initializePassport = require('./passport-config')
+import {initializePassport} from './passport-config.js'
 initializePassport(passport, 
     email => users.find(user => user.email === email), 
     id => users.find(user => user.id === id)
@@ -19,7 +34,7 @@ initializePassport(passport,
 const app = express()
 
 app.use(express.json())
-app.use(express.static(__dirname));
+app.use(express.static('./'));
 app.use(express.urlencoded({ extended: false}))//allows access to page html
 const users = [{name:"poop"}] //replace w/ db
 
@@ -34,25 +49,25 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 app.get('/',  checkNotAuthenicated,(req, res) => {
-    res.sendFile(__dirname + '/home.html')
+    res.sendFile( './home.html')
 })
 app.get('/login',  checkNotAuthenicated,(req, res) => {
-    res.sendFile(__dirname + '/index.html')
+    res.sendFile('./index.html')
 })
 app.get('/register',  checkNotAuthenicated,(req, res) => {
-    res.sendFile(__dirname + '/index.html')
+    res.sendFile('./index.html')
 })
 app.get('/userhome', checkAuthenticated, (req, res) => {
-    res.sendFile(__dirname + '/landing.html')
+    res.sendFile('./landing.html')
 })
 app.get('/update_re', checkAuthenticated, (req, res) => {
-    res.sendFile(__dirname + '/landing.html')
+    res.sendFile('./landing.html')
 })
 app.get('/update_in', checkAuthenticated, (req, res) => {
-    res.sendFile(__dirname + '/landing.html')
+    res.sendFile('./landing.html')
 })
 app.get('/users', (req,res) => {
-    res.json(users)
+    res.json(getUsers())
 })
 app.post('/userhome', checkAuthenticated, (req,res) => {
 

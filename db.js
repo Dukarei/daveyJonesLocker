@@ -1,7 +1,8 @@
 
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
-
+//const mysql = require('mysql2');
+//const dotenv = require('dotenv');
+import mysql from 'mysql2'
+import dotenv from 'dotenv'
 //load environment variables from .env
 dotenv.config();
 
@@ -14,7 +15,7 @@ const pool = mysql.createPool({
 }).promise();
 
 //getter functions to return user table or incoming/received ids for a certain user
-async function getIncoming(email) {
+export async function getIncoming(email) {
   try {
     const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ?', [email]);
     console.log(rows);
@@ -24,7 +25,7 @@ async function getIncoming(email) {
   }
 }
 
-async function getReceived(email) {
+export async function getReceived(email) {
   try {
     const [rows] = await pool.query('SELECT * FROM received_IDs WHERE email = ?', [email]);
     console.log(rows);
@@ -34,7 +35,7 @@ async function getReceived(email) {
   }
 }
 
-async function getUsers() {
+export async function getUsers() {
   try {
     const [rows] = await pool.query('SELECT * FROM users');
     console.log(rows);
@@ -46,7 +47,7 @@ async function getUsers() {
 
 //functions to add a user or add a new value to incoming/received ID tables
 
-async function insertIncoming(email, value) {
+export async function insertIncoming(email, value) {
   try {
     if (!(await inIncoming(value, email))) {
       const [result] = await pool.query('INSERT INTO incoming_IDs (email, value) VALUES (?, ?)', [email, value]);
@@ -59,7 +60,7 @@ async function insertIncoming(email, value) {
   }
 }
 
-async function insertReceived(email, value) {
+export async function insertReceived(email, value) {
   try {
     if (!(await inReceived(value, email))) {
       const [result] = await pool.query('INSERT INTO received_IDs (email, value) VALUES (?, ?)', [email, value]);
@@ -72,7 +73,7 @@ async function insertReceived(email, value) {
   }
 }
 
-async function insertUser(email, pass) {
+export async function insertUser(email, pass) {
   try {
     if (!(await inUsers(email))) {
       const [result] = await pool.query('INSERT INTO users (email, pass) VALUES (?, ?)', [email, pass]);
@@ -86,7 +87,7 @@ async function insertUser(email, pass) {
 }
 
 //functions to remove a specific user or value
-async function deleteReceived(email, value) {
+export async function deleteReceived(email, value) {
   try {
     const [result] = await pool.query('DELETE FROM received_IDs WHERE email = ? AND value = ?', [email, value]);
     return getReceived(email);
@@ -95,7 +96,7 @@ async function deleteReceived(email, value) {
   }
 }
 
-async function deleteIncoming(email, value) {
+export async function deleteIncoming(email, value) {
   try {
     const [result] = await pool.query('DELETE FROM incoming_IDs WHERE email = ? AND value = ?', [email, value]);
     return getIncoming(email);
@@ -104,7 +105,7 @@ async function deleteIncoming(email, value) {
   }
 }
 
-async function deleteUser(email) {
+export async function deleteUser(email) {
   try {
     //delete incoming and received IDs associated with the user
     await pool.query('DELETE FROM incoming_IDs WHERE email = ?', [email]);
@@ -118,7 +119,7 @@ async function deleteUser(email) {
   }
 }
 
-async function inReceived(value, email) {
+export async function inReceived(value, email) {
   try {
     const [result] = await pool.query('SELECT * FROM received_IDs WHERE value = ? AND email = ?', [value, email]);
     return result.length > 0;
@@ -127,7 +128,7 @@ async function inReceived(value, email) {
     return false;
   }
 }
-async function inIncoming(value, email) {
+export async function inIncoming(value, email) {
     try {
       const [result] = await pool.query('SELECT * FROM incoming_IDs WHERE value = ? AND email = ?', [value, email]);
       return result.length > 0;
@@ -137,7 +138,7 @@ async function inIncoming(value, email) {
     }
   }
   
-  async function inUsers(email) {
+export async function inUsers(email) {
     try {
       const [result] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
       return result.length > 0;
@@ -146,6 +147,7 @@ async function inIncoming(value, email) {
       return false;
     }
   }
+  
   
   // Example usage
   /*
