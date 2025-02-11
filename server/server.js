@@ -18,7 +18,7 @@ import {
     deleteUser,
     inReceived,
     inIncoming,
-    inUsers} from './db.js'
+    inUsers} from '../db/db.js'
 
 import express from 'express'
 import bcrypt from 'bcrypt'
