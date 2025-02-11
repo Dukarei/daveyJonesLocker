@@ -34,7 +34,7 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 app.get('/',  checkNotAuthenicated,(req, res) => {
-    res.sendFile(__dirname + '/index.html')
+    res.sendFile(__dirname + '/home.html')
 })
 app.get('/login',  checkNotAuthenicated,(req, res) => {
     res.sendFile(__dirname + '/index.html')
@@ -92,9 +92,15 @@ app.post('/register', checkNotAuthenicated, async (req, res) => {
 })
 
 app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
-    req.logOut()
-    res.redirect('/')
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.json({ success: true });
+    });
+    console.log('logOut() run')
 })
+
 /*
 app.post('/login', async (req,res) => { //login
     const user = users.find(user => user.name === req.body.username)

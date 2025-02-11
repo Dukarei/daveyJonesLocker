@@ -14,7 +14,24 @@ const   reBtn = document.getElementById('re_btn');
 const inForm = document.getElementById('in_form');
 const reForm = document.getElementById('re_form');
 
+const logoutForm = document.getElementById('logout-form');
 
+logoutForm.addEventListener('submit', (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    fetch('/logout', {
+        method: 'DELETE', // Specify the HTTP method
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
+
+    // Redirect to the desired page
+    window.location.href = '/';
+});
 
 
 
