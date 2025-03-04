@@ -40,6 +40,9 @@
     
     </div>
     -->
+    <div class="top-container" id = "status_container">
+       <p id = status_message></p> 
+    </div>
     <div class="container" id = "cont" >      
         <h1>Package Info</h1>
         <div class="incoming">
@@ -50,7 +53,7 @@
             <div class="incoming-footer">
                 <form action="/update_in" method="POST" id = "in_form"
                     style = " display: flex;flex-direction: row;align-items: center;gap: 10px; " >
-                    <input type="text" id="incoming_ID" style="height: 40px; width: 50%;">
+                    <input type="text" id="incoming_ID" style="height: 40px; width: 50%;"required>
                     <button type="submit" class="btn_incoming" id = "in_btn">Input to Server</button>
                 </form>
             </div>
@@ -64,7 +67,7 @@
             <div class="received-footer">
                 <form action="/update_re" method="POST" id = "re_form"
                     style = "display: flex;flex-direction: row;align-items: center;gap: 10px;"  >       
-                    <input type="text" id="received_ID" style="height: 40px; width: 50%;">
+                    <input type="text" id="received_ID" style="height: 40px; width: 50%;"required>
                     <button type="submit" class="btn_incoming" id = "re_btn">Input to Server</button>
                 </form>
             </div>

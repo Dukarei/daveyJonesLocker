@@ -14,7 +14,16 @@ body {
     min-height: 100vh;
     background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
 }
-
+.top-container {
+    position:fixed;
+    top: 0; /* Position the container at the top */
+    left: 0; /* Position the container at the left */
+    width: 100%; /* Make the container full-width */
+    text-align: center;
+    background: linear-gradient(90deg, #e2e2e2, #c9d6ff); 
+    padding: 10px; /* Add some padding */
+    z-index: 1000; /* Ensure the container is on top of other elements */
+  }
 .container {
     position: relative;
     width: 850px;

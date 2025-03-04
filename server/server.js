@@ -1,8 +1,7 @@
-import dotenv from 'dotenv'
+import dotenv from 'dotenv' //dotENV for env variables
 if(process.env.NODE_ENV !== 'production'){
     dotenv.config()    
 }
-
 //importing database functions - some not presently used but may be eventually
 import {
     getIn_ID,
@@ -21,7 +20,6 @@ import {
     inReceived,
     inIncoming,
     inUsers} from '../db/db.js'
-
 import express from 'express'
 import bcrypt from 'bcrypt'
 import passport from 'passport'
@@ -30,17 +28,62 @@ import session from 'express-session' //using session allows req.user.name alway
 import methodOverride from 'method-override'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import {initializePassport} from './passport-config.js'
 
+
+//set up local vars
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const app = express()
 
-import {initializePassport} from './passport-config.js'
-/*
-initializePassport(passport, 
-    email => users.find(user => user.email === email), 
-    id => users.find(user => user.id === id)
-)*/
-//using async db functions to initialize passport emai/id variables and thereby serialization descrbied in passport-config.js
+//various features for the app to use, enabling things like sessions and serving non-html files
+app.use(express.json())
+app.use(express.static('./'));
+const options = {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+};
+app.use(express.static(path.join(__dirname, 'public'), options));//allows serving of css
+app.use(express.urlencoded({ extended: false}))//allows access to page html elemts
+app.use(flash())
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(methodOverride('_method'))
+
+
+//rendering our different webpages based on input URL
+app.get('/',  checkNotAuthenicated,(req, res) => {
+    const filePath = path.join(__dirname, '../public', 'home.html');
+    res.sendFile(filePath);
+})
+app.get('/registration',  checkNotAuthenicated,(req, res) => {
+    const filePath = path.join(__dirname, '../public', 'index.html');
+    res.sendFile(filePath);
+    })
+app.get('/userhome', checkAuthenticated, (req, res) => {
+    const filePath = path.join(__dirname, '../public', 'landing.html');
+    res.sendFile(filePath);
+})
+//micro-access functions, probably to be deleted.
+app.get('/in_id', checkAuthenticated, (req,res) => {
+    console.log(getIn_ID())
+    res.json(getIn_ID())
+})
+app.get('/re_id', checkAuthenticated, (req,res) => {
+    console.log(getRe_ID())
+    res.json(getRe_ID())
+})
+
+
+//functions for the login/register page
 initializePassport(passport, 
     async (email) => {
       try {
@@ -57,91 +100,71 @@ initializePassport(passport,
           }
     }
   )
-
-const app = express()
-
-app.use(express.json())
-app.use(express.static('./'));
-const options = {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
+function checkAuthenticated(req, res, next){
+    if(req.isAuthenticated()){
+        return next()
+    }else{
+        return res.redirect('/')
     }
-  }
-};
-
-app.use(express.static(path.join(__dirname, 'public'), options));//allows serving of css
-app.use(express.urlencoded({ extended: false}))//allows access to page html elemts
-//const users = [{name:"poop"}] //replace w/ db
-
-app.use(flash())
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
-app.use(passport.initialize())
-app.use(passport.session())
-app.use(methodOverride('_method'))
-
-app.get('/',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, '../public', 'home.html');
-    res.sendFile(filePath);
-})
-/*
-app.get('/login',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, '../public', 'index.html');
-    res.sendFile(filePath);
-})
-app.get('/register',  checkNotAuthenicated,(req, res) => {
-    const filePath = path.join(__dirname, '../public', 'index.html');
-    res.sendFile(filePath);
-})
-    */
-app.get('/registration',  checkNotAuthenicated,(req, res) => {
-  
-    const filePath = path.join(__dirname, '../public', 'index.html');
-    res.sendFile(filePath);
-  
+}
+function checkNotAuthenicated(req,res,next){
+    if(req.isAuthenticated()){
+        return res.redirect('/userhome')
+    }
+    else{
+        next()
+    }
+}
+app.post('/register', checkNotAuthenicated, async (req, res) => {
+    try {
+	const { email, password } = req.body;
+	const salt = await bcrypt.genSalt(12); // Increase salt rounds for better security
+	const hashedPassword = await bcrypt.hash(password, salt);
+	const userId = Date.now().toString();
+    
+	const success = await insertUser(email, hashedPassword, userId);
+	if (success) {
+	  res.status(201).json({ message: 'User registered successfully', success: true });
+	} else {
+	  res.status(500).json({ message: 'User already registered', success: false });
+	}
+      } catch (error) {
+	console.error('Error registering user:', error);
+	res.status(500).json({ message: 'Error registering user', success: false });
+      }
     })
-app.get('/userhome', checkAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, '../public', 'landing.html');
-    res.sendFile(filePath);
-})
-/*
-app.get('/update_re', checkAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, '../public', 'landing.html');
-    res.sendFile(filePath);
-})
-app.get('/update_in', checkAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, '../public', 'landing.html');
-    res.sendFile(filePath);
-})
-app.get('/users', (req,res) => {
-    res.json(getUsers())
-})*/
-app.post('/userhome', checkAuthenticated, async (req,res) => {
 
-})
+app.post('/login', checkNotAuthenicated, passport.authenticate('local', {
+    successRedirect: '/userhome', 
+    failureFlash: true
+}))
 
-app.get('/in_id', checkAuthenticated, (req,res) => {
-    console.log(getIn_ID())
-    res.json(getIn_ID())
-})
-app.get('/re_id', checkAuthenticated, (req,res) => {
-    console.log(getRe_ID())
-    res.json(getRe_ID())
+app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.json({ success: true });
+    });
+    console.log('logOut() run')
 })
 
 
+//Tracking ID retrieval functions
 //need to error test these two, made for individual updates to user's re/in tables
 app.post('/update_re', checkAuthenticated, async (req,res) => {
 console.log('request body: ', req.body.re_id)
 try{
     const re_id = req.body.re_id //pulling from form contents in front-end
-    const received = await insertReceived(req.user.email, req.body.re_id);//move to db
+    const success = await insertReceived(req.user.email, req.body.re_id, success);//move to db
+    if(success){
+    res.body = {success:true}
     console.log('received ID: ', re_id) //log new id and send to response
-    res.json({received, re_id})
+    res.status(201).json({ message: 're_id added' })
+        }else{
+             res.body = {success:false}
+            res.status(500).json({ message: 'id already in table' })
+            } 
 } catch (error) {
     console.error('Error inserting received IDs:', error)
     res.status(500).json({ message: 'Error inserting received IDs' })
@@ -151,14 +174,20 @@ app.post('/update_in', checkAuthenticated, async (req,res) => {
     const in_id = req.body.in_id
     console.log('request body: ', req.body.in_id)
     try{
-        const incoming = await insertIncoming(req.user.email, req.body.in_id);
-        console.log('incoming ID: ', in_id)
-        res.json({incoming, in_id})
-    } catch (error) {
+        const success = await insertIncoming(req.user.email, req.body.in_id);
+        if(success){
+            console.log("success")
+            res.body = {success:true}   
+            console.log('incoming ID: ', in_id)
+            res.status(201).json({ message: 'in_id added' })
+        }else{
+             res.body = {success:false}
+            res.status(500).json({ message: 'id already in table' })
+            } 
+    }catch (error) {
         console.error('Error inserting incoming IDs:', error)
         res.status(500).json({ message: 'Error inserting incoming IDs' })
       } })
-
 
 //get methods for full tables, respective to a certain user
 app.get('/getUpdates', checkAuthenticated, async (req, res) => {
@@ -182,7 +211,7 @@ app.get('/received', checkAuthenticated, async (req,res) => {
   }  })
     
   app.get('/incoming', checkAuthenticated, async (req,res) => {
-    //code for received lists from db
+    //code for incoming lists from db
     try{
     const incoming = await getIncoming(req.user.email);
     console.log('incoming IDs: ', incoming)
@@ -192,83 +221,6 @@ app.get('/received', checkAuthenticated, async (req,res) => {
 
 
 
-
-app.post('/register', checkNotAuthenicated, async (req, res) => {
-    try {
-        
-        console.log('Request body:', req.body);
-        const salt = await bcrypt.genSalt()
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        
-        const user = { 
-            name: req.body.username, 
-            password: hashedPassword, 
-            email: req.body.email, 
-            id: Date.now().toString()
-        }
-        //old array method users.push(user)
-        insertUser(req.body.email, hashedPassword)
-        
-        console.log('User registered successfully:', user)
-        res.status(201).send('User registered successfully')
-    } catch (error) {
-        console.error('Error registering user:', error)
-        res.status(500).send('Error registering user')
-    }
-})
-
-app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
-    req.logout((err) => {
-        if (err) {
-            return next(err);
-        }
-        res.json({ success: true });
-    });
-    console.log('logOut() run')
-})
-
-/*
-app.post('/login', async (req,res) => { //login
-    const user = users.find(user => user.name === req.body.username)
-    if (user == null){
-        return res.status(400).send('User not found')
-    }
-    try{
-        if(await bcrypt.compare(req.body.password, user.password)){
-            //res.send('Success')
-            console.log("successful login")
-            res.redirect('landing.html') //not working properly atm
-        }else {
-          res.send('Incorrect password')  
-        }
-    }catch(error){
-        console.error('Error logging in user: ', error)
-        res.status(500).send('Error signing user in(likely wrong password)')
-    }
-})
-*/
-app.post('/login', checkNotAuthenicated, passport.authenticate('local', {
-    successRedirect: '/userhome', 
-    failureRedirect: '/',
-    failureFlash: true
-}))
-
-function checkAuthenticated(req, res, next){
-    if(req.isAuthenticated()){
-        return next()
-    }else{
-        return res.redirect('/')
-    }
-}
-
-function checkNotAuthenicated(req,res,next){
-    if(req.isAuthenticated()){
-        return res.redirect('/userhome')
-    }
-    else{
-        next()
-    }
-}
 
 
 

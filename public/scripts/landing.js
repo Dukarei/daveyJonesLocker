@@ -1,19 +1,14 @@
-//add stuff for inputting incoming as well as removing received, then POST stuff in backend/on buttons in html
-//backend logic for removing received over 5
-//add logic for only displaying so many nums
-//add post thing like in login, but display elements will be client side updated adn loaded in/sent off on page
-//refresh so it keeps up with user input stuff at all times  
-//logout button 
 
 //import { json } from "express";
-
 //import { response } from "express";
+//TODO: add deletion operations, etc. 
 
 
 
 const container = document.getElementById('cont');
-const    inBtn = document.getElementById('in_btn');
-const   reBtn = document.getElementById('re_btn');
+const inBtn = document.getElementById('in_btn');
+const reBtn = document.getElementById('re_btn');
+const MAX_NUM_CHILDREN = 12; //max num of list items(ids) to show per table
 
 const inForm = document.getElementById('in_form');
 const reForm = document.getElementById('re_form');
@@ -27,35 +22,7 @@ function getUpdates() {
     .then(data => updateUI(data))
     .catch(error => console.error(error));
 }
-/*
-function updateUI(data) {
-  const incomingIds = document.getElementById('incoming_IDs');
-  const receivedIds = document.getElementById('received_IDs');
-  const numChildren = incomingIds.children.length;
-  const numChildren2 = receivedIds.children.length;
-  // Update the incoming and received tables with the new data
-  incomingIds.innerHTML = '';
-  data.incoming.forEach(id => {
-    if(numChildren > 18){
-      console.log("removing prev. top item from display window")
-      incomingIds.removeChild(incomingIds.children[0]);
-    }
-    const li = document.createElement('li');
-    li.textContent = id;
-    incomingIds.appendChild(li);
-  });
 
-  receivedIds.innerHTML = '';
-  data.received.forEach(id => {
-    if(numChildren2 > 18){
-      console.log("removing prev. top item from display window")
-      receivedIds.removeChild(receivedIds.children[0]);
-    }
-    const li = document.createElement('li');
-    li.textContent = id;
-    receivedIds.appendChild(li);
-  });
-}*/
 //fills out the incoming and received tables on website load
 function updateUI(data) {
   const incomingIds = document.getElementById('incoming_IDs');
@@ -65,24 +32,28 @@ function updateUI(data) {
 
   incomingIds.innerHTML = '';
   data.incoming.forEach(id => {
-    if(numChildren > 18){
+    if(numChildren > MAX_NUM_CHILDREN){
       console.log("removing prev. top item from display window")
       incomingIds.removeChild(incomingIds.children[0]);
     }
     const li = document.createElement('li');
     li.textContent = `Value: ${id.value}`;
     incomingIds.appendChild(li);
+    const li2 = document.createElement('li');
+    incomingIds.appendChild(li2);
   });
 
   receivedIds.innerHTML = '';
   data.received.forEach(id => {
-    if(numChildren2 > 18){
+    if(numChildren2 > MAX_NUM_CHILDREN){
       console.log("removing prev. top item from display window")
       receivedIds.removeChild(receivedIds.children[0]);
     }
     const li = document.createElement('li');
     li.textContent = `Value: ${id.value}`;
     receivedIds.appendChild(li);
+    const li2 = document.createElement('li');
+    receivedIds.appendChild(li2);
   });
 }
 
@@ -97,32 +68,33 @@ function updateReceived(response) {
 
   //receivedIds.innerHTML = '';
   //ensure that this check is working as intended and maintaining lowered child count on screen
-  while (numChildren > 18){
+  if (numChildren > MAX_NUM_CHILDREN){
       console.log("removing prev. top item from display window")
       receivedIds.removeChild(receivedIds.children[0]);
     }
     const li = document.createElement('li');
     li.textContent = `Value: ${re_id}`;
     receivedIds.appendChild(li);
+    const li2 = document.createElement('li');
+    receivedIds.appendChild(li2);
   
 }
 function updateIncoming(response) {
   const in_id = response.in_id
-  console.log(response)
+  console.log(in_id)
   const incomingIds = document.getElementById('incoming_IDs');
   const numChildren = incomingIds.children.length;
-
   //incomingIds.innerHTML = '';
   
-  while (numChildren > 18){
+  if (numChildren > MAX_NUM_CHILDREN){
       console.log("removing prev. top item from display window")
       incomingIds.removeChild(incomingIds.children[0]);
     }
     const li = document.createElement('li');
     li.textContent = `Value: ${in_id}`;
     incomingIds.appendChild(li);
-  
-
+    const li2 = document.createElement('li');
+    incomingIds.appendChild(li2);
 }
 
 
@@ -130,7 +102,6 @@ function updateIncoming(response) {
 
 logoutForm.addEventListener('submit', (event) => {
     event.preventDefault(); // Prevent default form submission
-
     fetch('/logout', {
         method: 'DELETE', // Specify the HTTP method
         headers: {
@@ -140,27 +111,28 @@ logoutForm.addEventListener('submit', (event) => {
     .then((response) => response.json())
     .then((data) => console.log(data))
     .catch((error) => console.error(error))
-    
-
     // Redirect to the desired page
     window.location.href = '/';
 });
 
 
 
-isLoggedIn = false
 //these checks are for moving new values to db and hopefully pre-sorting css elements before actually adding them in updateReceived()
 //add checks to remove received stuff from incoming, etx
 function handleReceived(event) {
   event.preventDefault(); //prevent default form submission(page reload)
   const re_id = document.getElementById('received_ID').value;
   const re_ids = document.getElementById('received_IDs');
-
+  
+  if(isNaN(re_id)|| re_id === ""){
+    console.error("inserted value not a number");
+    ebar({lvl:1,target:container, msg: "inserted value not a number"}); 
+    return; //hopefully precent form submission
+  }else {
   console.log('new re_id:', { re_id });
-
   const li = document.createElement('li');
   const numChildren = re_ids.children.length;
-  if(numChildren > 18){
+  if(numChildren > MAX_NUM_CHILDREN){
     console.log("removing prev. top item from display window")
     re_ids.removeChild(re_ids.children[0]);
   }
@@ -175,26 +147,24 @@ function handleReceived(event) {
     },
     body: JSON.stringify({ re_id })
   })
-  .then(response => response.json())
+  .then(response =>{
+      if(!response.body.success) ebar("ID already in table");
+  })
   .then(data => updateReceived(data)) //update received with data acquired from this function
   
   .catch(error => console.error(error));
-  /*
-  fetch('/re_id', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => updateReceived(data))
-  .catch(error => console.error(error));
-  */
+}
 }
 
 function handleIncoming(event) {
   event.preventDefault(); 
   const in_id  = document.getElementById('incoming_ID').value;
+  if(isNaN(in_id) || in_id === ""){
+    console.error("inserted value not a number");
+    ebar("inserted value not a number"); 
+    return; //hopefully precent form submission
+  }
+  else{
   console.log('new in_id:', { in_id });
   fetch('/update_in', {
     method: 'POST',
@@ -202,22 +172,12 @@ function handleIncoming(event) {
       'Content-Type': 'application/json'
     }
   })
-  .then(response => response.json())
-  .then(data => updateIncoming(data)) //update incoming with data acquired from this function
-  .catch(error => console.error(error));
-  /*
-  fetch('/in_id', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({in_id })
+  .then(response => {
+      if(!response.body.success) ebar("ID already in table");
   })
-  .then(response => response.json())
-  .then(data => updateIncoming(data))
-  .catch(error => console.error(error));
-  */
-  
+  .then(data => updateIncoming(data)) //update incoming with data acquired from this function
+  .catch(error => console.error(error))
+}
 }
 
 
@@ -235,10 +195,20 @@ reBtn.addEventListener('click', () => {
     container.classList.remove('active');
     
 });
-
-function updateLists(){
-
-}
+function ebar (message) { //function to turn top container into error message, should export but will instead copy/paste
+    const bar = document.getElementById("status_message");
+    bar.style.background= 'red;';
+    bar.textContent = message;   
+    button = document.createElement('button');
+    button.textContent = "close"; 
+    main_bar = document.getElementById("status_container");
+    main_bar.appendChild(button);
+    button.addEventListener('click', ()=> {
+      bar.style.background= 'linear-gradient(90deg, #e2e2e2, #c9d6ff);'; 
+      bar.textContent = "";
+      button.remove();
+    }); 
+  }
 //updateLists();
 getUpdates();
 //setInterval(getUpdates, 20000);

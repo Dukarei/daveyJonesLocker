@@ -56,7 +56,7 @@ export async function getRe_ID(email, value) {
 //getter functions to return user table or incoming/received ids for a certain user
 export async function getIncoming(email) {
   try {
-    const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ?', [email]);
+    const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ? LIMIT 8', [email]);
     console.log(rows);
     return rows;
   } catch (error) {
@@ -68,7 +68,7 @@ export async function getIncoming(email) {
 
 export async function getReceived(email) {
   try {
-    const [rows] = await pool.query('SELECT * FROM received_IDs WHERE email = ?', [email]);
+    const [rows] = await pool.query('SELECT * FROM received_IDs WHERE email = ? LIMIT 8', [email]);
     console.log(rows);
     return rows;
   } catch (error) {
@@ -89,12 +89,17 @@ export async function getUsers() {
 //functions to add a user or add a new value to incoming/received ID tables
 
 export async function insertIncoming(email, value) {
+  if(isNaN(value)){
+    console.error("inserted value not a number");
+    return;
+  }
   try {
     if (!(await inIncoming(value, email))) {
       const [result] = await pool.query('INSERT INTO incoming_IDs (email, value) VALUES (?, ?)', [email, value]);
-      return getIncoming(email);
+      return true;
     } else {
       console.error('Value already in incoming table:', value);
+      return false;
     }
   } catch (error) {
     console.error('Error inserting incoming ID:', error);
@@ -105,22 +110,24 @@ export async function insertReceived(email, value) {
   try {
     if (!(await inReceived(value, email))) {
       const [result] = await pool.query('INSERT INTO received_IDs (email, value) VALUES (?, ?)', [email, value]);
-      return getReceived(email);
+      return true;
     } else {
       console.error('Value already in received table:', value);
+      return false;
     }
   } catch (error) {
     console.error('Error inserting received ID:', error);
   }
 }
 
-export async function insertUser(email, pass) {
+export async function insertUser(email, pass) { //stealing winAPI ideas
   try {
-    if (!(await inUsers(email))) {
+    if (!(await inUsers(email))) { 
       const [result] = await pool.query('INSERT INTO users (email, pass) VALUES (?, ?)', [email, pass]);
-      return getUsers();
+      return true;
     } else {
       console.error('User already registered:', email);
+      return false;
     }
   } catch (error) {
     console.error('Error inserting user:', error);
@@ -190,7 +197,7 @@ export async function inUsers(email) {
   }
   
   
-  // Example usage
+  //example usage
   /*
   getUsers()
     .then(users => console.log('Users:', users))
