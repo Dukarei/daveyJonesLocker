@@ -121,7 +121,6 @@ app.post('/register', checkNotAuthenicated, async (req, res) => {
 	const salt = await bcrypt.genSalt(12); // Increase salt rounds for better security
 	const hashedPassword = await bcrypt.hash(password, salt);
 	const userId = Date.now().toString();
-    
 	const success = await insertUser(email, hashedPassword, userId);
 	if (success) {
 	  res.status(201).json({ message: 'User registered successfully', success: true });

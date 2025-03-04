@@ -4,6 +4,7 @@ const registerBtn = document.querySelector('.register-btn');
 const loginBtn = document.querySelector('.login-btn');
 const loginForm = document.getElementById('login_form');
 const registerForm = document.getElementById('register_form');
+let currentColor = 'linear-gradient(90deg, #e2e2e2, #c9d6ff)'; //tracking present sbar color to hopefully fix error message issues
 
 //updated to async/await syntax instead of promises, which GREATLY eases error message display
 async function handleLoginSubmit(event) {
@@ -63,44 +64,33 @@ loginBtn.addEventListener('click', () => {
     container.classList.remove('active');
 });
 
-//status bars(colors only change once per page load)
-function sbar (message) { //function to turn top container into error message, should export but will instead copy/paste
-  const prebutton = document.getElementById("temp_button");
-  if(prebutton == null){
-    const bar = document.getElementById("status_message");
-    bar.style.backgroundColor = 'green';
-    bar.textContent = message;   
-    button = document.createElement('button');
-    button.textContent = "close"; 
-    button.id = "temp_button";
-    if(button){
-      main_bar = document.getElementById("status_container");
-      main_bar.appendChild(button);
-      button.addEventListener('click', ()=> {
-        bar.style.background= 'linear-gradient(90deg, #e2e2e2, #c9d6ff)'; 
-        bar.textContent = "";
-        main_bar.removeChild(button);
-      }); 
-    }
+//status bar to display error/ success messages
+function updateStatusBar(message, color) {
+  const bar = document.getElementById("status_message");
+  const mainBar = document.getElementById("status_container");
+  const preButton = document.getElementById("temp_button");
+  if (preButton) {
+    mainBar.removeChild(preButton);
   }
+  currentColor = color;
+  bar.style.backgroundColor = color;
+  bar.textContent = message;
+  
+  const button = document.createElement('button');
+  button.textContent = "close";
+  button.id = "temp_button";
+  if (button) {
+    mainBar.appendChild(button);
+    button.addEventListener('click', () => {
+      //bar.style.background = 'linear-gradient(90deg, #e2e2e2, #c9d6ff)';
+      bar.textContent = "";
+      mainBar.removeChild(button);
+    });
   }
-function ebar (message) { //function to turn top container into error message, should export but will instead copy/paste
-  const prebutton = document.getElementById("temp_button");
-  if(prebutton == null){
-    const bar = document.getElementById("status_message");
-    bar.style.backgroundColor = 'red';
-    bar.textContent = message;   
-    button = document.createElement('button');
-    button.textContent = "close"; 
-    button.id = "temp_button";
-    if(button){
-      main_bar = document.getElementById("status_container");
-      main_bar.appendChild(button);
-      button.addEventListener('click', ()=> {
-        bar.style.background= 'linear-gradient(90deg, #e2e2e2, #c9d6ff)'; 
-        bar.textContent = "";
-        main_bar.removeChild(button);
-      }); 
-    }
-  }
-  }
+}
+function sbar(message) {
+  updateStatusBar(message, 'green');
+}
+function ebar(message) {
+  updateStatusBar(message, 'red');
+}
