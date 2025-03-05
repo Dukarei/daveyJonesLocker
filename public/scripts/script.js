@@ -4,7 +4,7 @@ const registerBtn = document.querySelector('.register-btn');
 const loginBtn = document.querySelector('.login-btn');
 const loginForm = document.getElementById('login_form');
 const registerForm = document.getElementById('register_form');
-let currentColor = 'linear-gradient(90deg, #e2e2e2, #c9d6ff)'; //tracking present sbar color to hopefully fix error message issues
+let currentColor = 'linear-gradient(90deg, #b30000, #1a0000)'; //tracking present sbar color to hopefully fix error message issues
 
 //updated to async/await syntax instead of promises, which GREATLY eases error message display
 async function handleLoginSubmit(event) {
