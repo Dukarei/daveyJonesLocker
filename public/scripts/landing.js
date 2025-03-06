@@ -5,7 +5,6 @@ import {sbar, ebar} from './util.js'
 const container = document.getElementById('cont');
 const inBtn = document.getElementById('in_btn');
 const reBtn = document.getElementById('re_btn');
-const MAX_NUM_CHILDREN = 12; //max num of list items(ids) to show per table
 const inForm = document.getElementById('in_form');
 const reForm = document.getElementById('re_form');
 const logoutForm = document.getElementById('logout-form');
@@ -18,11 +17,6 @@ const incomingArray = []; //runtime list of list-item IDs that is maintained in 
 function insertListItem(id, listId){
     let list = receivedIds;
     if(listId === 1)list = incomingIds;
-    const numChildren = list.children.length;
-    if (numChildren > MAX_NUM_CHILDREN){
-      console.log("removing prev. top item from display window")
-      list.removeChild(list.children[0]);
-    }
     const li = document.createElement('li');
     li.textContent = `Value: ${id.value}`;
     let itemDiv = document.createElement('div');

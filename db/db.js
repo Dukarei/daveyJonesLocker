@@ -56,7 +56,7 @@ export async function getRe_ID(email, value) {
 //getter functions to return user table or incoming/received ids for a certain user
 export async function getIncoming(email) {
   try {
-    const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ? LIMIT 8', [email]);
+    const [rows] = await pool.query('SELECT * FROM incoming_IDs WHERE email = ? LIMIT 30', [email]);
     console.log(rows);
     return rows;
   } catch (error) {
@@ -68,7 +68,7 @@ export async function getIncoming(email) {
 
 export async function getReceived(email) {
   try {
-    const [rows] = await pool.query('SELECT * FROM received_IDs WHERE email = ? LIMIT 8', [email]);
+    const [rows] = await pool.query('SELECT * FROM received_IDs WHERE email = ? LIMIT 30', [email]);
     console.log(rows);
     return rows;
   } catch (error) {
