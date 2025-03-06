@@ -31,9 +31,17 @@ function insertListItem(id, listId){
     deleteButton.classList.add('btn-link');
     deleteButton.style.backgroundColor = '#b30000';
     deleteButton.style.color = '#fff';
+    itemDiv.style.display = 'none';
     itemDiv.appendChild(deleteButton);
+    li.addEventListener('mouseover',()=>{
+	itemDiv.style.display = 'block';
+    });
+    li.addEventListener('mouseout',()=>{
+	itemDiv.style.display = 'none';
+    });
     li.appendChild(itemDiv);
     list.appendChild(li);
+    //instead make a delete function which takes id as a parameter which we create here
 }
 async function getUpdates(){
     try{
