@@ -2,7 +2,7 @@
 //import { json } from "express";
 //import { response } from "express";
 //TODO: add deletion operations, etc. 
-
+import {sbar, ebar} from './util.js'
 
 
 const container = document.getElementById('cont');
@@ -14,25 +14,40 @@ const inForm = document.getElementById('in_form');
 const reForm = document.getElementById('re_form');
 
 const logoutForm = document.getElementById('logout-form');
-
+/*
 function getUpdates() {
   console.log("Getting updates")
   fetch('/getUpdates')
     .then(response => response.json())
     .then(data => updateUI(data))
     .catch(error => console.error(error));
+}*/
+async function getUpdates(){
+    try{
+	console.log("Getting Updates");
+	const response = await fetch('/getUpdates', {
+	  method: 'GET',
+	  headers: {
+	    'Content-Type': 'application/json'
+	  }} );
+	const data = await response.json();
+	updateUI(data);
+    }catch(error){
+	console.error("Issue Getting Updates");
+	ebar("Error Getting Updates From Server");
+    }
 }
 
 //fills out the incoming and received tables on website load
 function updateUI(data) {
   const incomingIds = document.getElementById('incoming_IDs');
   const receivedIds = document.getElementById('received_IDs');
-  const numChildren = incomingIds.children.length;
-  const numChildren2 = receivedIds.children.length;
+  const numIn = incomingIds.children.length;
+  const numRe = receivedIds.children.length;
 
   incomingIds.innerHTML = '';
   data.incoming.forEach(id => {
-    if(numChildren > MAX_NUM_CHILDREN){
+    if(numIn > MAX_NUM_CHILDREN){
       console.log("removing prev. top item from display window")
       incomingIds.removeChild(incomingIds.children[0]);
     }
@@ -45,7 +60,7 @@ function updateUI(data) {
 
   receivedIds.innerHTML = '';
   data.received.forEach(id => {
-    if(numChildren2 > MAX_NUM_CHILDREN){
+    if(numRe > MAX_NUM_CHILDREN){
       console.log("removing prev. top item from display window")
       receivedIds.removeChild(receivedIds.children[0]);
     }
@@ -126,8 +141,8 @@ function handleReceived(event) {
   
   if(isNaN(re_id)|| re_id === ""){
     console.error("inserted value not a number");
-    ebar({lvl:1,target:container, msg: "inserted value not a number"}); 
-    return; //hopefully precent form submission
+    ebar("inserted value not a number"); 
+    return; //hopefully prevent form submission
   }else {
   console.log('new re_id:', { re_id });
   const li = document.createElement('li');
@@ -195,20 +210,6 @@ reBtn.addEventListener('click', () => {
     container.classList.remove('active');
     
 });
-function ebar (message) { //function to turn top container into error message, should export but will instead copy/paste
-    const bar = document.getElementById("status_message");
-    bar.style.background= 'red;';
-    bar.textContent = message;   
-    button = document.createElement('button');
-    button.textContent = "close"; 
-    main_bar = document.getElementById("status_container");
-    main_bar.appendChild(button);
-    button.addEventListener('click', ()=> {
-      bar.style.background= 'linear-gradient(90deg, #e2e2e2, #c9d6ff);'; 
-      bar.textContent = "";
-      button.remove();
-    }); 
-  }
 //updateLists();
 getUpdates();
 //setInterval(getUpdates, 20000);

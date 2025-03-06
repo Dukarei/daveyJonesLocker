@@ -1,10 +1,11 @@
+import {sbar, ebar} from './util.js'
+
 //init html element access variables
 const container = document.querySelector('.container');
 const registerBtn = document.querySelector('.register-btn');
 const loginBtn = document.querySelector('.login-btn');
 const loginForm = document.getElementById('login_form');
 const registerForm = document.getElementById('register_form');
-let currentColor = 'linear-gradient(90deg, #b30000, #1a0000)'; //tracking present sbar color to hopefully fix error message issues
 
 //updated to async/await syntax instead of promises, which GREATLY eases error message display
 async function handleLoginSubmit(event) {
@@ -63,9 +64,9 @@ registerBtn.addEventListener('click', () => {
 loginBtn.addEventListener('click', () => {
     container.classList.remove('active');
 });
-
+/*
 //status bar to display error/ success messages
-function updateStatusBar(message, color) {
+export function updateStatusBar(message, color) {
   const bar = document.getElementById("status_message");
   const mainBar = document.getElementById("status_container");
   const preButton = document.getElementById("temp_button");
@@ -75,7 +76,6 @@ function updateStatusBar(message, color) {
   currentColor = color;
   bar.style.backgroundColor = color;
   bar.textContent = message;
-  
   const button = document.createElement('button');
   button.textContent = "close";
   button.id = "temp_button";
@@ -86,11 +86,19 @@ function updateStatusBar(message, color) {
       bar.textContent = "";
       mainBar.removeChild(button);
     });
-  }
+      if(color === 'green' && currentColor === 'green'){
+	setTimeout(()=>{
+	currentColor = 'linear-gradient(90deg, #b30000, #1a0000)';
+	bar.style.backgroundColor = 'linear-gradient(90deg, #b30000, #1a0000)'; 
+	bar.textContent = "";
+	mainBar.removeChild(button);
+	}, 3000);// = 3 seconds BEFORE code in block is executed
+      }
+    }
 }
-function sbar(message) {
+export function sbar(message) {
   updateStatusBar(message, 'green');
 }
-function ebar(message) {
+export function ebar(message) {
   updateStatusBar(message, 'red');
-}
+}*/
