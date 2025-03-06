@@ -18,7 +18,7 @@ function insertListItem(id, listId){
     let list = receivedIds;
     if(listId === 1)list = incomingIds;
     const li = document.createElement('li');
-    li.textContent = `Value: ${id.value}`;
+    li.textContent = `Value: ${id}`;
     let itemDiv = document.createElement('div');
     let deleteButton = document.createElement('button');
     deleteButton.innerHTML = 'Delete Value';
@@ -48,11 +48,11 @@ async function getUpdates(){
 	const data = await response.json();
 	incomingIds.innerHTML = '';
 	data.incoming.forEach(id => {
-	    insertListItem(id, 1);
+	    insertListItem(id.value, 1);
 	  });
 	receivedIds.innerHTML = '';
 	data.received.forEach(id => {
-	    insertListItem(id, 0);
+	    insertListItem(id.value, 0);
 	  });
     }catch(error){
 	console.error("Issue Getting Updates", error);
@@ -83,7 +83,7 @@ async function handleReceived(event) {
 	ebar("ID already in table");
       }
       else{
-	  insertListItem(re_id, 0);
+	  insertListItem(data.re_id, 0);
       }
       //updateReceived(data); //actually update list?
     } catch (error) {
@@ -98,7 +98,6 @@ async function handleIncoming(event) {
     ebar("Inserted value not a number");
     return;
   } else {
-    console.log('new in_id:', { in_id });
     try {
       const response = await fetch('/update_in', {
         method: 'POST',
@@ -112,7 +111,7 @@ async function handleIncoming(event) {
         ebar("ID already in table");
       }
       else{
-	insertListItem(in_id, 1)
+	insertListItem(data.in_id, 1)
       }
     } catch (error){
       console.error(error);

@@ -89,12 +89,9 @@ export async function getUsers() {
 //functions to add a user or add a new value to incoming/received ID tables
 
 export async function insertIncoming(email, value) {
-  if(isNaN(value)){
-    console.error("inserted value not a number");
-    return;
-  }
   try {
     if (!(await inIncoming(value, email))) {
+      if(await inReceived(value, email))deleteReceived(email, value);
       const [result] = await pool.query('INSERT INTO incoming_IDs (email, value) VALUES (?, ?)', [email, value]);
       return true;
     } else {
@@ -109,6 +106,7 @@ export async function insertIncoming(email, value) {
 export async function insertReceived(email, value) {
   try {
     if (!(await inReceived(value, email))) {
+      if(await inIncoming(value, email))deleteIncoming(email, value);
       const [result] = await pool.query('INSERT INTO received_IDs (email, value) VALUES (?, ?)', [email, value]);
       return true;
     } else {

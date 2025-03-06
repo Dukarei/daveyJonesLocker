@@ -148,7 +148,7 @@ try{
     success = await insertReceived(req.user.email, req.body.re_id, success);//move to db
     if(success){
 	console.log('received ID: ', re_id) //log new id and send to response
-	res.status(201).json({ message: 're_id added',success:true })
+	res.status(201).json({ message: 're_id added',success:true,re_id})
     }else{
 	res.status(500).json({ message: 'id already in table',success:false })
 	} 
@@ -164,7 +164,7 @@ try{
     success = await insertIncoming(req.user.email, req.body.in_id);
     if(success){
 	console.log('incoming ID: ', in_id)
-	res.status(201).json({ message: 'in_id added', success:true })
+	res.status(201).json({ message: 'in_id added', success:true, in_id})
     }else{
 	res.status(500).json({ message: 'id already in table', success:false })
 	} 
