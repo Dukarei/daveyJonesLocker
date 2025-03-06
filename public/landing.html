@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,64 +8,38 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./public/styles.css">
 </head>
-
 <body>
-    <!--
-    <div class="container">
-        <h1>Package Info</h1>
-        <div class="incoming">
-            <div>
-                <form action = "/register" method = "POST">
-                    <h1 style = "top:0;">Incoming</h1>
-                <ul id = "incoming_IDs">
-                </ul>
-                <span style="height:20px;"></span>`
-                <button type = "submit" class = "btn_incoming"> Input to Server </button>
-                </form>
-            </div>
-        </div>
-
-        <div class="received">
-            <div>
-                <form action = "/userhome" method = "POST">
-                    <h1>Received</h1>
-                <ul id = "received_IDs">
-                </ul>
-                <span style="height:20px;"></span>`
-                <button type = "submit" class = "btn_incoming"> Input to Server </button>
-                </form>
-            </div>
-        </div>
-    
-    </div>
-    -->
     <div class="top-container" id = "status_container">
        <p id = status_message></p> 
     </div>
     <div class="container" id = "cont" >      
         <h1>Package Info</h1>
+
         <div class="incoming">
             <div class="incoming-header">
                 <h1>Incoming</h1>
             </div>
-            <div style = "display:flex; max-height:425px;flex-grow:1;"><ul id="incoming_IDs"style="margin-bottom: 20px; align-items: center; margin-left: 20px; margin-top: 30px;"></ul></div>
+            <div style = "display:flex; max-height:425px;flex-grow:1;">
+		<ul id="incoming_IDs"style="margin-bottom: 20px; align-items: center; margin-left: 20px; margin-top: 30px;"></ul>
+	    </div>
             <div class="incoming-footer">
                 <form action="/update_in" method="POST" id = "in_form"
-                    style = " display: flex;flex-direction: row;align-items: center;gap: 10px; " >
+                style = " display: flex;flex-direction: row;align-items: center;gap: 10px; " >
                     <input type="text" id="incoming_ID" style="height: 40px; width: 50%;"required>
                     <button type="submit" class="btn_incoming" id = "in_btn">Input to Server</button>
                 </form>
             </div>
         </div>
-    
         <div class="received">
             <div class="received-header">
                 <h1>Received</h1>
             </div>
-            <div style = "display:flex; max-height:425px;flex-grow:1;"><ul id="received_IDs" style="margin-bottom: 20px; align-items: center; margin-left: 20px; margin-top: 30px;"></ul></div>
+            <div style = "display:flex; max-height:425px;flex-grow:1;">
+		<ul id="received_IDs" style="margin-bottom: 20px; align-items: center; margin-left: 20px; margin-top: 30px;"></ul>
+	    </div>
             <div class="received-footer">
-                <form action="/update_re" method="POST" id = "re_form"
-                    style = "display: flex;flex-direction: row;align-items: center;gap: 10px;"  >       
+                <form action="/update_re" method="POST" id = "re_form" 
+		style = "display: flex;flex-direction: row;align-items: center;gap: 10px;"  >       
                     <input type="text" id="received_ID" style="height: 40px; width: 50%;"required>
                     <button type="submit" class="btn_incoming" id = "re_btn">Input to Server</button>
                 </form>

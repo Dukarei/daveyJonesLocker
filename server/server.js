@@ -72,16 +72,6 @@ app.get('/userhome', checkAuthenticated, (req, res) => {
     const filePath = path.join(__dirname, '../public', 'landing.html');
     res.sendFile(filePath);
 })
-//micro-access functions, probably to be deleted.
-app.get('/in_id', checkAuthenticated, (req,res) => {
-    console.log(getIn_ID())
-    res.json(getIn_ID())
-})
-app.get('/re_id', checkAuthenticated, (req,res) => {
-    console.log(getRe_ID())
-    res.json(getRe_ID())
-})
-
 
 //functions for the login/register page
 initializePassport(passport, 
@@ -152,41 +142,36 @@ app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
 //Tracking ID retrieval functions
 //need to error test these two, made for individual updates to user's re/in tables
 app.post('/update_re', checkAuthenticated, async (req,res) => {
-console.log('request body: ', req.body.re_id)
 try{
     const re_id = req.body.re_id //pulling from form contents in front-end
-    const success = await insertReceived(req.user.email, req.body.re_id, success);//move to db
+    let success = false;
+    success = await insertReceived(req.user.email, req.body.re_id, success);//move to db
     if(success){
-    res.body = {success:true}
-    console.log('received ID: ', re_id) //log new id and send to response
-    res.status(201).json({ message: 're_id added' })
-        }else{
-             res.body = {success:false}
-            res.status(500).json({ message: 'id already in table' })
-            } 
+	console.log('received ID: ', re_id) //log new id and send to response
+	res.status(201).json({ message: 're_id added',success:true })
+    }else{
+	res.status(500).json({ message: 'id already in table',success:false })
+	} 
 } catch (error) {
     console.error('Error inserting received IDs:', error)
     res.status(500).json({ message: 'Error inserting received IDs' })
   } })
 
 app.post('/update_in', checkAuthenticated, async (req,res) => {
+try{
     const in_id = req.body.in_id
-    console.log('request body: ', req.body.in_id)
-    try{
-        const success = await insertIncoming(req.user.email, req.body.in_id);
-        if(success){
-            console.log("success")
-            res.body = {success:true}   
-            console.log('incoming ID: ', in_id)
-            res.status(201).json({ message: 'in_id added' })
-        }else{
-             res.body = {success:false}
-            res.status(500).json({ message: 'id already in table' })
-            } 
-    }catch (error) {
-        console.error('Error inserting incoming IDs:', error)
-        res.status(500).json({ message: 'Error inserting incoming IDs' })
-      } })
+    let success = false;
+    success = await insertIncoming(req.user.email, req.body.in_id);
+    if(success){
+	console.log('incoming ID: ', in_id)
+	res.status(201).json({ message: 'in_id added', success:true })
+    }else{
+	res.status(500).json({ message: 'id already in table', success:false })
+	} 
+}catch (error) {
+    console.error('Error inserting incoming IDs:', error)
+    res.status(500).json({ message: 'Error inserting incoming IDs' })
+  } })
 
 //get methods for full tables, respective to a certain user
 app.get('/getUpdates', checkAuthenticated, async (req, res) => {

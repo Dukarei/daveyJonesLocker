@@ -137,13 +137,41 @@ export async function insertUser(email, pass) { //stealing winAPI ideas
 //functions to remove a specific user or value
 export async function deleteReceived(email, value) {
   try {
+    if (await inReceived(value, email)){
+      const [result] = await pool.query('DELETE FROM received_IDs WHERE email = ? AND value = ?', [email, value]);
+      return true;
+    } else {
+      console.error('Value not in received table:', value);
+      return false;
+    }
+  } catch (error) {
+    console.error('Error deleting received ID:', error);
+  }
+}
+/*
+export async function deleteReceived(email, value) {
+  try {
     const [result] = await pool.query('DELETE FROM received_IDs WHERE email = ? AND value = ?', [email, value]);
     return getReceived(email);
   } catch (error) {
     console.error('Error popping received ID:', error);
   }
 }
-
+*/
+export async function deleteIncoming(email, value) {
+  try {
+    if (await inIncoming(value, email)){
+      const [result] = await pool.query('DELETE FROM incoming_IDs WHERE email = ? AND value = ?', [email, value]);
+      return true;
+    } else {
+      console.error('Value not in incoming table:', value);
+      return false;
+    }
+  } catch (error) {
+    console.error('Error deleting incoming ID:', error);
+  }
+}
+/*
 export async function deleteIncoming(email, value) {
   try {
     const [result] = await pool.query('DELETE FROM incoming_IDs WHERE email = ? AND value = ?', [email, value]);
@@ -152,7 +180,7 @@ export async function deleteIncoming(email, value) {
     console.error('Error popping incoming ID:', error);
   }
 }
-
+*/
 export async function deleteUser(email) {
   try {
     //delete incoming and received IDs associated with the user

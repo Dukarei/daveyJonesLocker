@@ -9,7 +9,32 @@ const MAX_NUM_CHILDREN = 12; //max num of list items(ids) to show per table
 const inForm = document.getElementById('in_form');
 const reForm = document.getElementById('re_form');
 const logoutForm = document.getElementById('logout-form');
+const incomingIds = document.getElementById('incoming_IDs');
+const receivedIds = document.getElementById('received_IDs');
 
+const receivedArray = [];
+const incomingArray = []; //runtime list of list-item IDs that is maintained in order to delete a given entry
+
+function insertListItem(id, listId){
+    let list = receivedIds;
+    if(listId === 1)list = incomingIds;
+    const numChildren = list.children.length;
+    if (numChildren > MAX_NUM_CHILDREN){
+      console.log("removing prev. top item from display window")
+      list.removeChild(list.children[0]);
+    }
+    const li = document.createElement('li');
+    li.textContent = `Value: ${id.value}`;
+    let itemDiv = document.createElement('div');
+    let deleteButton = document.createElement('button');
+    deleteButton.innerHTML = 'Delete Value';
+    deleteButton.classList.add('btn-link');
+    deleteButton.style.backgroundColor = '#b30000';
+    deleteButton.style.color = '#fff';
+    itemDiv.appendChild(deleteButton);
+    li.appendChild(itemDiv);
+    list.appendChild(li);
+}
 async function getUpdates(){
     try{
 	console.log("Getting Updates");
@@ -19,119 +44,54 @@ async function getUpdates(){
 	    'Content-Type': 'application/json'
 	  }} );
 	const data = await response.json();
-	const incomingIds = document.getElementById('incoming_IDs');
-	const receivedIds = document.getElementById('received_IDs');
-	const numIn = incomingIds.children.length;
-	const numRe = receivedIds.children.length;
-
 	incomingIds.innerHTML = '';
 	data.incoming.forEach(id => {
-	    if(numIn > MAX_NUM_CHILDREN){
-	      console.log("removing prev. top item from display window")
-	      incomingIds.removeChild(incomingIds.children[0]);
-	    }
-	    const li = document.createElement('li');
-	    li.textContent = `Value: ${id.value}`;
-	    incomingIds.appendChild(li);
-	    const li2 = document.createElement('li');
-	    incomingIds.appendChild(li2);
+	    insertListItem(id, 1);
 	  });
 	receivedIds.innerHTML = '';
 	data.received.forEach(id => {
-	    if(numRe > MAX_NUM_CHILDREN){
-	      console.log("removing prev. top item from display window")
-	      receivedIds.removeChild(receivedIds.children[0]);
-	    }
-	    const li = document.createElement('li');
-	    li.textContent = `Value: ${id.value}`;
-	    receivedIds.appendChild(li);
-	    const li2 = document.createElement('li');
-	    receivedIds.appendChild(li2);
+	    insertListItem(id, 0);
 	  });
     }catch(error){
-	console.error("Issue Getting Updates");
+	console.error("Issue Getting Updates", error);
 	ebar("Error Getting Updates From Server");
     }
-}
-
-//functions made for updating a list after a single addition, still need to add deletion options
-function updateReceived(response) {
-  const re_id = response.re_id
-  console.log(re_id)
-  const receivedIds = document.getElementById('received_IDs');
-  const numChildren = receivedIds.children.length;
-  //receivedIds.innerHTML = '';
-  //ensure that this check is working as intended and maintaining lowered child count on screen
-  if (numChildren > MAX_NUM_CHILDREN){
-      console.log("removing prev. top item from display window")
-      receivedIds.removeChild(receivedIds.children[0]);
-    }
-    const li = document.createElement('li');
-    li.textContent = `Value: ${re_id}`;
-    receivedIds.appendChild(li);
-    const li2 = document.createElement('li');
-    receivedIds.appendChild(li2);
-}
-function updateIncoming(response) {
-  const in_id = response.in_id
-  console.log(in_id)
-  const incomingIds = document.getElementById('incoming_IDs');
-  const numChildren = incomingIds.children.length;
-  //incomingIds.innerHTML = '';
-  if (numChildren > MAX_NUM_CHILDREN){
-      console.log("removing prev. top item from display window")
-      incomingIds.removeChild(incomingIds.children[0]);
-    }
-    const li = document.createElement('li');
-    li.textContent = `Value: ${in_id}`;
-    incomingIds.appendChild(li);
-    const li2 = document.createElement('li');
-    incomingIds.appendChild(li2);
 }
 
 //these checks are for moving new values to db and hopefully pre-sorting css elements before actually adding them in updateReceived()
 //add checks to remove received stuff from incoming, etx
 async function handleReceived(event) {
-  event.preventDefault(); 
-  const re_id = document.getElementById('received_ID').value;
-  const re_ids = document.getElementById('received_IDs');
-  if (isNaN(re_id) || re_id === "") {
+    event.preventDefault(); 
+    const re_id = document.getElementById('received_ID').value;
+    if (re_id === "") {
     console.error("Inserted value not a number");
     ebar("Inserted value not a number");
     return;
-  } else {
-    console.log('new re_id:', { re_id });
-    const li = document.createElement('li');
-    const numChildren = re_ids.children.length;
-    if (numChildren > MAX_NUM_CHILDREN) {
-      console.log("Removing previous top item from display window");
-      re_ids.removeChild(re_ids.children[0]);
-    }
-    li.textContent = re_id;
-    // re_ids.appendChild(li);
+    } 
     try {
       const response = await fetch('/update_re', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ re_id })
+	method: 'POST',
+	headers: {
+	  'Content-Type': 'application/json'
+	},
+	body: JSON.stringify({ re_id })
       });
       const data = await response.json();
       if (!data.success) {
-        ebar("ID already in table");
+	ebar("ID already in table");
       }
-      updateReceived(data);
+      else{
+	  insertListItem(re_id, 0);
+      }
+      //updateReceived(data); //actually update list?
     } catch (error) {
       console.error(error);
     }
-  }
-}
+    }
 async function handleIncoming(event) {
   event.preventDefault(); 
   const in_id = document.getElementById('incoming_ID').value;
-
-  if (isNaN(in_id) || in_id === "") {
+  if (in_id === "") {
     console.error("Inserted value not a number");
     ebar("Inserted value not a number");
     return;
@@ -149,7 +109,9 @@ async function handleIncoming(event) {
       if (!data.success) {
         ebar("ID already in table");
       }
-      updateIncoming(data);
+      else{
+	insertListItem(in_id, 1)
+      }
     } catch (error){
       console.error(error);
     }
