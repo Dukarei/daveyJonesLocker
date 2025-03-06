@@ -137,6 +137,7 @@ app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
 
 app.post('/delete_id', checkAuthenticated, async (req, res) => {
 try{
+    console.log(req.body.id);
     if(await inReceived(req.body.id, req.user.email)){
 	const re_id = req.body.id;
 	let success = false;
@@ -146,8 +147,8 @@ try{
 	    res.status(201).json({message: "ID removed successfully", success:true});
 	}
     }
-    else if(await inIncoming(req.body.id)){
-	const in_id = req.body.in_id;
+    else if(await inIncoming(req.body.id, req.user.email)){
+	const in_id = req.body.id;
 	let success = false;
 	success = await deleteIncoming(req.user.email, in_id);
 	if(success){
