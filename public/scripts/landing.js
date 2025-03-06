@@ -1,5 +1,3 @@
-//TODO: add deletion operations, etc. 
-//basic idea is handler functions will clean our input but typing this out it would seem a better idea to send to server, get a result, then decide whether or not to append a list+display succes, remove/edit list item and display success, or display an error
 import {sbar, ebar} from './util.js'
 
 const container = document.getElementById('cont');
@@ -11,9 +9,20 @@ const logoutForm = document.getElementById('logout-form');
 const incomingIds = document.getElementById('incoming_IDs');
 const receivedIds = document.getElementById('received_IDs');
 
-const receivedArray = [];
-const incomingArray = []; //runtime list of list-item IDs that is maintained in order to delete a given entry
-
+function removeListItem(id, listId){
+    let list = receivedIds;
+    if(listId === 1)list = incomingIds;
+    for(let i = 0; i<list.children.length;i++){
+	const listItemText = list.children[i].textContent;
+	const regex = /Value: (.*)Delete Value/;
+	const match = listItemText.match(regex);
+	if(match && match[1] === id){
+	    console.log(list.children[i].textContent);
+	    list.children[i].remove();
+	    break;
+	}
+    }
+}
 function insertListItem(id, listId){
     let list = receivedIds;
     if(listId === 1)list = incomingIds;
@@ -33,10 +42,45 @@ function insertListItem(id, listId){
     li.addEventListener('mouseout',()=>{
 	itemDiv.style.display = 'none';
     });
+    deleteButton.addEventListener('click', deleteID);
     li.appendChild(itemDiv);
     list.appendChild(li);
     //instead make a delete function which takes id as a parameter which we create here
 }
+async function deleteID(event) {
+    event.preventDefault(); 
+    const listItem = event.target.parentNode.parentNode;//should be list item itself 
+    const itemText = event.target.parentNode.parentNode.textContent;//should be list item itself 
+    const regex = /Value: (.*)Delete Value/;
+    const match = itemText.match(regex);
+    const id = match[1];
+    if(!id)ebar("regex error");
+    if (id === "") {
+    console.error("Inserted value not a number");
+    ebar("Inserted value not a number");
+    return;
+    } 
+    try {
+      const response = await fetch('/delete_id', {
+	method: 'POST',
+	headers: {
+	  'Content-Type': 'application/json'
+	}, 
+	body: JSON.stringify({id: id})
+      });
+      const data = await response.json();
+      if (!data.success) {
+	ebar("ID not in table/issue");
+      }
+      else{
+	  listItem.remove();
+	  sbar("Successfully removed ID");
+      }
+      //updateReceived(data); //actually update list?
+    } catch (error) {
+      console.error(error);
+    }
+    }
 async function getUpdates(){
     try{
 	console.log("Getting Updates");
@@ -84,6 +128,8 @@ async function handleReceived(event) {
       }
       else{
 	  insertListItem(data.re_id, 0);
+          removeListItem(data.re_id, 1);
+	  sbar("Successfully added ID");
       }
       //updateReceived(data); //actually update list?
     } catch (error) {
@@ -112,6 +158,8 @@ async function handleIncoming(event) {
       }
       else{
 	insertListItem(data.in_id, 1)
+	removeListItem(data.in_id, 0)
+	sbar("Successfully added ID");
       }
     } catch (error){
       console.error(error);

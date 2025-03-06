@@ -4,13 +4,10 @@ if(process.env.NODE_ENV !== 'production'){
 }
 //importing database functions - some not presently used but may be eventually
 import {
-    getIn_ID,
-    getRe_ID,
     getUserByEmail,
     getUserById,
     getIncoming,
     getReceived,
-    getUsers,
     insertIncoming,
     insertReceived,
     insertUser,
@@ -138,6 +135,34 @@ app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
     console.log('logOut() run')
 })
 
+app.post('/delete_id', checkAuthenticated, async (req, res) => {
+try{
+    if(await inReceived(req.body.id, req.user.email)){
+	const re_id = req.body.id;
+	let success = false;
+	success = await deleteReceived(req.user.email, re_id);
+	if(success){
+	    console.log("deleted ID", re_id);
+	    res.status(201).json({message: "ID removed successfully", success:true});
+	}
+    }
+    else if(await inIncoming(req.body.id)){
+	const in_id = req.body.in_id;
+	let success = false;
+	success = await deleteIncoming(req.user.email, in_id);
+	if(success){
+	    console.log("deleted ID", in_id);
+	    res.status(201).json({message: "ID removed successfully", success:true});
+	}
+    }
+    else{
+	res.status(500).json({message: "Error deleting/not in db", success:false});
+    }
+}catch(error){
+    console.error("error deleting ID", error);
+    res.status(500).json({message: "Error deleting ID"});
+}
+})
 
 //Tracking ID retrieval functions
 //need to error test these two, made for individual updates to user's re/in tables
@@ -145,7 +170,7 @@ app.post('/update_re', checkAuthenticated, async (req,res) => {
 try{
     const re_id = req.body.re_id //pulling from form contents in front-end
     let success = false;
-    success = await insertReceived(req.user.email, req.body.re_id, success);//move to db
+    success = await insertReceived(req.user.email, req.body.re_id);//move to db
     if(success){
 	console.log('received ID: ', re_id) //log new id and send to response
 	res.status(201).json({ message: 're_id added',success:true,re_id})
@@ -190,6 +215,7 @@ app.get('/received', checkAuthenticated, async (req,res) => {
     try{
     const received = await getReceived(req.user.email);
     console.log('received IDs: ', received)
+          res.json({received });
 } catch (error) {
     console.error('Error getting received IDs:', error)
   }  })
@@ -198,6 +224,7 @@ app.get('/received', checkAuthenticated, async (req,res) => {
     //code for incoming lists from db
     try{
     const incoming = await getIncoming(req.user.email);
+    res.json({ incoming});
     console.log('incoming IDs: ', incoming)
 } catch (error) {
     console.error('Error getting incoming IDs:', error)
