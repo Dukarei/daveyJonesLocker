@@ -177,6 +177,33 @@ form {
     font-weight: 600;
     bottom:0px
 }
+.remove-animation {
+  animation: fadeOut 0.5s;
+}
+.add-animation {
+  animation: fadeIn 0.5s;
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .container p {
     font-size: 14.5px;

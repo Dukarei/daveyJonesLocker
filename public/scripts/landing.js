@@ -39,9 +39,11 @@ function insertListItem(id, listId){
     itemDiv.appendChild(deleteButton);
     li.addEventListener('mouseover',()=>{
 	itemDiv.style.display = 'block';
+	li.style.outline = '1px solid #b30000';
     });
     li.addEventListener('mouseout',()=>{
 	itemDiv.style.display = 'none';
+	li.style.outline = 'none';
     });
     deleteButton.addEventListener('click', deleteID);
     if(listId === 1){
@@ -55,6 +57,7 @@ function insertListItem(id, listId){
 	moveButton.addEventListener('click', moveID);
 	}
     li.appendChild(itemDiv);
+    li.classList.add('add-animation');
     list.appendChild(li);
 	//instead make a delete function which takes id as a parameter which we create here
 }
@@ -84,6 +87,7 @@ async function moveID(event) {
 	ebar("ID not in table/issue");
       }
       else{
+	  listItem.classList.add('remove-animation');
 	  listItem.remove();
 	  insertListItem(id, 0);
 	  sbar("Successfully moved ID");
@@ -119,6 +123,7 @@ async function deleteID(event) {
 	ebar("ID not in table/issue");
       }
       else{
+	  listItem.classList.add('remove-animation');
 	  listItem.remove();
 	  sbar("Successfully removed ID");
       }
