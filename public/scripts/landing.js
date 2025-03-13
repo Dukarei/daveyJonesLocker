@@ -34,6 +34,7 @@ function insertListItem(id, listId){
     deleteButton.classList.add('btn-link');
     deleteButton.style.backgroundColor = '#b30000';
     deleteButton.style.color = '#fff';
+    deleteButton.style.padding = '5px';
     itemDiv.style.display = 'none';
     itemDiv.appendChild(deleteButton);
     li.addEventListener('mouseover',()=>{
@@ -43,9 +44,54 @@ function insertListItem(id, listId){
 	itemDiv.style.display = 'none';
     });
     deleteButton.addEventListener('click', deleteID);
+    if(listId === 1){
+	let moveButton = document.createElement('button');
+	moveButton.innerHTML = 'Move Value';
+	moveButton.classList.add('btn-link');
+	moveButton.style.backgroundColor = '#b30000';
+	moveButton.style.color = '#fff';
+	moveButton.style.padding = '5px';
+	itemDiv.appendChild(moveButton);
+	moveButton.addEventListener('click', moveID);
+	}
     li.appendChild(itemDiv);
     list.appendChild(li);
-    //instead make a delete function which takes id as a parameter which we create here
+	//instead make a delete function which takes id as a parameter which we create here
+}
+async function moveID(event) {
+    event.preventDefault(); 
+    const listItem = event.target.parentNode.parentNode;//should be list item itself 
+    const itemText = event.target.parentNode.parentNode.textContent;//should be list item itself 
+    const regex = /Value: (.*)Delete ValueMove Value/;
+    const match = itemText.match(regex);
+    const id = match[1];
+    if(!id)ebar("regex error");
+    if (id === "") {
+    console.error("Inserted value not a number");
+    ebar("Inserted value not a number");
+    return;
+    } 
+    try {
+      const response = await fetch('/move_id', {
+	method: 'POST',
+	headers: {
+	  'Content-Type': 'application/json'
+	}, 
+	body: JSON.stringify({id: id})
+      });
+      const data = await response.json();
+      if (!data.success) {
+	ebar("ID not in table/issue");
+      }
+      else{
+	  listItem.remove();
+	  insertListItem(id, 0);
+	  sbar("Successfully moved ID");
+      }
+      //updateReceived(data); //actually update list?
+    } catch (error) {
+      console.error(error);
+    }
 }
 async function deleteID(event) {
     event.preventDefault(); 
@@ -80,7 +126,7 @@ async function deleteID(event) {
     } catch (error) {
       console.error(error);
     }
-    }
+}
 async function getUpdates(){
     try{
 	console.log("Getting Updates");

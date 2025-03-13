@@ -135,9 +135,39 @@ app.delete('/logout', (req,res) => { //FINISH THIS OR YOULL LOOK SUPER DUMB
     console.log('logOut() run')
 })
 
+app.post('/move_id', checkAuthenticated, async (req, res) => {
+try{
+    console.log("beginning ID move: ", req.body.id);
+    if(await inIncoming(req.body.id, req.user.email)){
+	const id = req.body.id;
+	let success = false;
+	success = await deleteIncoming(req.user.email, id);
+	if(success){
+	    console.log("deleted ID", id);
+	    if(!await inReceived(req.body.id, req.user.email)){
+		const in_id = req.body.id;
+		let success = false;
+		success = await insertReceived(req.user.email, id);
+		if(success){
+		    console.log("moved ID", in_id);
+		    res.status(201).json({message: "ID moved successfully", success:true});
+		}
+	    }
+//	 res.status(201).json({message: "ID removed successfully", success:true});
+	}
+    }
+    else{
+	res.status(500).json({message: "Error moving ID/not in db", success:false});
+    }
+}catch(error){
+    console.error("error deleting ID", error);
+    res.status(500).json({message: "Error deleting ID"});
+}
+})
+
 app.post('/delete_id', checkAuthenticated, async (req, res) => {
 try{
-    console.log(req.body.id);
+    console.log("beginning ID delete", req.body.id);
     if(await inReceived(req.body.id, req.user.email)){
 	const re_id = req.body.id;
 	let success = false;
