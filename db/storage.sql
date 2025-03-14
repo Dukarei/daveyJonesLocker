@@ -11,7 +11,14 @@ CREATE TABLE incoming_IDs (
     FOREIGN KEY (email) REFERENCES users(email),
     value VARCHAR(255), 
     PRIMARY KEY(email,value)
-
+);
+CREATE TABLE boxKeys (
+    email VARCHAR(255) ,
+    FOREIGN KEY (email) REFERENCES users(email),
+    e integer,
+    d integer, 
+    n integer,
+    boxID integer PRIMARY KEY AUTO_INCREMENT
 );
 
 

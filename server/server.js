@@ -260,7 +260,18 @@ app.get('/received', checkAuthenticated, async (req,res) => {
 } catch (error) {
     console.error('Error getting incoming IDs:', error)
   }  })
-
+//box  info methods
+app.post('/boxInfo', passport.authenticate('local', { failureRedirect: '/login', failureMessage: false }),
+  async function(req, res) {
+    try {
+          const incoming = await getIncoming(req.user.email);
+          const received = await getReceived(req.user.email);
+          res.json({ incoming, received });
+    } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Error getting updates' });
+    }
+      });
 
 
 
