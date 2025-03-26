@@ -265,8 +265,6 @@ app.get('/received', checkAuthenticated, async (req,res) => {
 app.get('/boxInfo', async function(req, res) {
   try {
     const { email, pass } = req.body;
-    console.log("email: ", email);
-    console.log("password: ", pass);
     if (!email || !pass) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -275,8 +273,6 @@ app.get('/boxInfo', async function(req, res) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
     const hashword = user.pass;
-    console.log("pass: ", pass);
-    console.log("hash: ", hashword);
     if (await bcrypt.compare(pass, hashword)) {
       const incoming = await getIncoming(email);
       const received = await getReceived(email);
@@ -290,22 +286,31 @@ app.get('/boxInfo', async function(req, res) {
   }      
 });
 app.post('/boxUpdate', async function(req, res) {
-    try {
-	bcrypt.compare(req.body.password, user.password, function(err, res) {
-	  if (err){
-	  }
-	  if (res) {
-	  } else {
-	    return response.json({success: false, message: 'passwords do not match'});
-	  }
-	});
-	const incoming = await getIncoming(req.body.email);
-	const received = await getReceived(req.body.email);
-      res.json({ incoming, received });
-    } catch (error) {
-          console.error(error);
-          res.status(500).json({ message: 'Error getting updates' });
+  try {
+      //input stuff here to insert received items incrementally(auto-deletion and timestamps already handled, just need email:value pairs
+      //could also update them live, but in reality it adds no benefit as the UPS worker cannot be assumed any training beyond 
+      //simply opening the box w/ the scanner which is a complex enough feat of its own.
+    const { email, pass } = req.body;
+    if (!email || !pass) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    const hashword = user.pass;
+    if (await bcrypt.compare(pass, hashword)) {
+	//insert/delete given userID stuff here
+        //will need try/catch around db stuff and to send success:true or success:false so that the 
+	//pi app(and server for website statusbar update on login) can have info about errors with scanning(and perhaps a video of the session could be perma-saved to pi memory for review
+	//if it is believed the worker did bad stuffs
+    } else {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Error posting updates' });
+  }      
       });
 
 
