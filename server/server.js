@@ -261,12 +261,47 @@ app.get('/received', checkAuthenticated, async (req,res) => {
     console.error('Error getting incoming IDs:', error)
   }  })
 //box  info methods
-app.post('/boxInfo', passport.authenticate('local', { failureRedirect: '/login', failureMessage: false }),
-  async function(req, res) {
+//look into adding method to check the password's validity.
+app.get('/boxInfo', async function(req, res) {
+  try {
+    const { email, pass } = req.body;
+    console.log("email: ", email);
+    console.log("password: ", pass);
+    if (!email || !pass) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    const hashword = user.pass;
+    console.log("pass: ", pass);
+    console.log("hash: ", hashword);
+    if (await bcrypt.compare(pass, hashword)) {
+      const incoming = await getIncoming(email);
+      const received = await getReceived(email);
+      return res.json({ incoming, received });
+    } else {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Error getting updates' });
+  }      
+});
+app.post('/boxUpdate', async function(req, res) {
     try {
-          const incoming = await getIncoming(req.user.email);
-          const received = await getReceived(req.user.email);
-          res.json({ incoming, received });
+	bcrypt.compare(req.body.password, user.password, function(err, res) {
+	  if (err){
+	  }
+	  if (res) {
+	  } else {
+	    return response.json({success: false, message: 'passwords do not match'});
+	  }
+	});
+	const incoming = await getIncoming(req.body.email);
+	const received = await getReceived(req.body.email);
+      res.json({ incoming, received });
     } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'Error getting updates' });
