@@ -290,7 +290,7 @@ app.post('/boxUpdate', async function(req, res) {
       //input stuff here to insert received items incrementally(auto-deletion and timestamps already handled, just need email:value pairs
       //could also update them live, but in reality it adds no benefit as the UPS worker cannot be assumed any training beyond 
       //simply opening the box w/ the scanner which is a complex enough feat of its own.
-    const { email, pass } = req.body;
+    const { email, pass, received } = req.body;
     if (!email || !pass) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -300,10 +300,18 @@ app.post('/boxUpdate', async function(req, res) {
     }
     const hashword = user.pass;
     if (await bcrypt.compare(pass, hashword)) {
-	//insert/delete given userID stuff here
-        //will need try/catch around db stuff and to send success:true or success:false so that the 
-	//pi app(and server for website statusbar update on login) can have info about errors with scanning(and perhaps a video of the session could be perma-saved to pi memory for review
-	//if it is believed the worker did bad stuffs
+	const insertionPromises = received.map(item => insertReceived(email, item));
+	  try {
+	    const results = await Promise.all(insertionPromises);
+	    const insertionSuccessful = results.every(result => result);
+	    return res.status(201).json({
+	      message: insertionSuccessful ? 'All IDs successfully added' : 'Some IDs failed to add',
+	      success: insertionSuccessful,
+	    });
+	  } catch (error) {
+	    console.error(error);
+	    return res.status(500).json({ message: 'Error adding IDs' });
+	  }
     } else {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
